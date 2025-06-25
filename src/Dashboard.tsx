@@ -2,11 +2,13 @@ import { Card } from "@looker/components";
 import { getEmbedSDK, ILookerConnection } from "@looker/embed-sdk";
 import React, { useCallback } from "react";
 import styled from "styled-components";
-import { useAppContext } from "./AppContext";
-import useExtensionSdk from "./hooks/useExtensionSdk";
-import { urlToRecord } from "./utils/urlToRecord";
-import useSdk from "./hooks/useSdk";
 import useSWR from "swr";
+import { useAppContext } from "./AppContext";
+import { useExtensionContextData } from "./hooks/useExtensionContext";
+import useExtensionSdk from "./hooks/useExtensionSdk";
+import useSdk from "./hooks/useSdk";
+import { getBoardList } from "./utils/getBoardList";
+import { urlToRecord } from "./utils/urlToRecord";
 
 const StyledCard = styled(Card)`
   width: 100%;
@@ -19,13 +21,27 @@ const StyledCard = styled(Card)`
 `;
 
 const Dashboard: React.FC = () => {
-  const { dashboard, setGlobalFilters, setDashboard, global_filters, folder_id, setSelectedDashboardId, selected_dashboard_id } = useAppContext();
+  const {
+    setGlobalFilters,
+    setDashboard,
+    global_filters,
+    folder_id,
+    board_id,
+    changeDashboardId,
+    selected_dashboard_id,
+  } = useAppContext();
   const extension_sdk = useExtensionSdk();
+  const { config_data } = useExtensionContextData();
   const sdk = useSdk();
+
   const folder_dashboards = useSWR(
-    folder_id ? `folder-dashboards-${folder_id}` : null, 
-    ()=>sdk.ok(sdk.folder_dashboards(folder_id!, "id"))
-  )
+    folder_id?.length ? `folder-dashboards-${folder_id}` : null,
+    () => sdk.ok(sdk.folder_dashboards(folder_id!, "id"))
+  );
+  const board = useSWR(board_id?.length ? `board-${board_id}` : null, () =>
+    sdk.ok(sdk.board(board_id!))
+  );
+
   const dashboardRef = useCallback(
     (el: HTMLDivElement) => {
       if (el && !el.children.length) {
@@ -34,17 +50,22 @@ const Dashboard: React.FC = () => {
         let initial_dashboard = selected_dashboard_id;
         if (!initial_dashboard) {
           if (folder_id) {
-            initial_dashboard = folder_dashboards.data?.[0].id
+            initial_dashboard = folder_dashboards.data?.[0]?.id;
+          } else if (board_id && board.data) {
+            const list = getBoardList(board.data!);
+            initial_dashboard = list.find(
+              (item) => item.type === "dashboard"
+            )?.id;
           } else {
-            initial_dashboard = extension_sdk.getContextData()?.dashboards?.[0];
+            initial_dashboard = config_data.dashboards?.[0];
           }
         }
-        
+
         if (!initial_dashboard) {
-          return
+          return;
         }
         if (!selected_dashboard_id) {
-          setSelectedDashboardId(initial_dashboard)
+          changeDashboardId(initial_dashboard, true);
         }
         embed_sdk
           .createDashboardWithId(initial_dashboard)
@@ -68,9 +89,17 @@ const Dashboard: React.FC = () => {
           });
       }
     },
-    [extension_sdk, setGlobalFilters, setDashboard, folder_dashboards.data]
-  )
-  return <StyledCard p="xsmall" raised borderRadius="large" ref={dashboardRef} />
+    [
+      extension_sdk,
+      setGlobalFilters,
+      setDashboard,
+      folder_dashboards.data,
+      board.data,
+    ]
+  );
+  return (
+    <StyledCard p="xsmall" raised borderRadius="large" ref={dashboardRef} />
+  );
 };
 
 export default Dashboard;

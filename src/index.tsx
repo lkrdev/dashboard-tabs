@@ -5,6 +5,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import { AppContextProvider } from "./AppContext";
+import { ToastProvider } from "./components/Toast/ToastContext";
 import "./index.css";
 
 declare module "@looker/embed-sdk" {
@@ -30,7 +31,9 @@ const mountApp = () => {
     <ExtensionProvider>
       <ComponentsProvider>
         <AppContextProvider>
-          <App />
+          <ToastProvider>
+            <App />
+          </ToastProvider>
         </AppContextProvider>
       </ComponentsProvider>
     </ExtensionProvider>,

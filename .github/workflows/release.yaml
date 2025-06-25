@@ -1,0 +1,67 @@
+name: Release Docker Image
+
+on:
+  release:
+    types: [created]
+
+env:
+  REGION: us-central1
+  APP_NAME: dashboard-tabs
+  BUCKET_NAME: ${{ secrets.CDN_BUCKET_NAME }}
+  TAG: ${{ github.event.release.tag_name }}
+
+jobs:
+  build-and-upload-frontend:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install and use Node.js via nvm
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+          nvm install # Installs version from .nvmrc
+          nvm use     # Uses the installed version
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build frontend
+        run: npm run build
+
+      # Need auth and gcloud setup before uploading
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+      - name: Upload frontend bundle to GCS tag
+        uses: google-github-actions/upload-cloud-storage@v2
+        with:
+          process_gcloudignore: false
+          path: dist
+          destination: ${{ env.BUCKET_NAME }}/apps/${{ env.APP_NAME }}/${{ env.TAG }}
+          parent: false
+      - name: Upload frontend bundle to GCS
+        uses: google-github-actions/upload-cloud-storage@v2
+        with:
+          process_gcloudignore: false
+          path: dist
+          destination: ${{ env.BUCKET_NAME }}/apps/${{ env.APP_NAME }}/latest
+          parent: false
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Invalidate Cloud CDN
+        run: |
+          gcloud compute url-maps invalidate-cdn-cache ${{ secrets.CDN_URL_MAP }} \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --path=/apps/${{ env.APP_NAME }}/latest/* \
+            --async

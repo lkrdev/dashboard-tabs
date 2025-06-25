@@ -1,8 +1,24 @@
-application: simple_extension {
-  label: "Simple Extension"
-#   url: "https://localhost:8080/bundle.js"
-  file: "bundle.js"
+application: dashboard_tabs {
+  label: "Dashboard Tabs"
+  url: "https://cdn.lkr.dev/apps/dashboard-tabs/latest/bundle.js"
   entitlements: {
-    core_api_methods: ["me", "search_dashboards", "dashboard", "folder_dashboards"]
+    core_api_methods: [
+      "me", 
+      "dashboard", 
+      "search_dashboards", 
+      "folder_dashboards", 
+      "board", 
+      "search_boards", 
+      "folder", 
+      "search_folders"
+    ]
+    navigation: yes
+    use_embeds: yes
+    use_iframes: yes
+    new_window: yes
+    use_form_submit: yes
+  }
+  mount_points: {
+    standalone: yes
   }
 }

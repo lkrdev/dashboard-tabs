@@ -1,10 +1,11 @@
 import { ILookerConnection } from "@looker/embed-sdk";
 import { IUser } from "@looker/sdk";
-import React, { createContext, useContext, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useMemo } from "react";
+import { useLocation } from "react-router-dom";
 import useSWR from "swr";
+import { ToastProvider } from "./components/Toast/ToastContext";
 import useSdk from "./hooks/useSdk";
 import useSearchParams from "./hooks/useSearchParams";
-import { useLocation } from "react-router-dom";
 
 type GlobalFilters = { [key: string]: string };
 
@@ -18,8 +19,10 @@ interface AppContextType {
   global_filters: GlobalFilters;
   setGlobalFilters: React.Dispatch<React.SetStateAction<GlobalFilters>>;
   folder_id?: string;
+  board_id?: string;
   selected_dashboard_id?: string;
-  setSelectedDashboardId: React.Dispatch<React.SetStateAction<string | undefined>>;
+  changeDashboardId: (id: string, skip_load?: boolean) => void;
+  is_admin: boolean;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -27,24 +30,48 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { search_params, updateSearchParams } = useSearchParams()
+  const { search_params, updateSearchParams } = useSearchParams();
   const sdk = useSdk();
   const { data: me, isLoading, error } = useSWR("me", () => sdk.ok(sdk.me()));
   const [dashboard, setDashboard] = React.useState<ILookerConnection>();
-  const [global_filters, setGlobalFilters] = React.useState<GlobalFilters>(search_params);
-  const [selected_dashboard_id, setSelectedDashboardId] = React.useState<string | undefined>(search_params.dashboard_id);
+  const [global_filters, setGlobalFilters] =
+    React.useState<GlobalFilters>(search_params);
+  const [selected_dashboard_id, setSelectedDashboardId] = React.useState<
+    string | undefined
+  >(search_params.dashboard_id);
 
-  const location = useLocation()
-  const folder_id = location.pathname.startsWith('/folders/') ? location.pathname.split('/')[2] : undefined
+  const location = useLocation();
+  const folder_id = location.pathname.startsWith("/folders/")
+    ? location.pathname.split("/")[2]
+    : undefined;
+
+  const board_id = location.pathname.startsWith("/boards/")
+    ? location.pathname.split("/")[2]
+    : undefined;
 
   useEffect(() => {
-    updateSearchParams(global_filters)
-  }, [global_filters])
+    updateSearchParams(global_filters);
+  }, [global_filters]);
 
-  useEffect(()=>{
-    updateSearchParams({ dashboard_id: selected_dashboard_id })
-  }, [selected_dashboard_id])
+  const is_admin = useMemo(() => {
+    return Boolean(me?.role_ids?.includes("2"));
+  }, [me]);
 
+  const changeDashboardId = (id: string, skip_load: boolean = false) => {
+    setSelectedDashboardId(id);
+    updateSearchParams({ dashboard_id: id });
+    if (skip_load) {
+      return;
+    } else {
+      dashboard?.loadDashboard(
+        id +
+          "?" +
+          Object.entries(global_filters)
+            .map(([key, value]) => `${key}=${value}`)
+            .join("&")
+      );
+    }
+  };
 
   return (
     <AppContext.Provider
@@ -56,11 +83,13 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
         global_filters,
         setGlobalFilters,
         folder_id,
+        board_id,
         selected_dashboard_id,
-        setSelectedDashboardId
+        changeDashboardId,
+        is_admin,
       }}
     >
-      {children}
+      <ToastProvider>{children}</ToastProvider>
     </AppContext.Provider>
   );
 };
