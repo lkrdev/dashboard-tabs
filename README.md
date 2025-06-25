@@ -6,7 +6,7 @@ A Looker extension that creates tabbed dashboards with advanced navigation, glob
 
 ## Use it now
 
-Add this to any of your projects' `manifest.lkml` files.
+Add this to any of your projects' `manifest.lkml` files, refresh the page, then go to Applications > Dashboard Tabs.
 
 ```
 application: dashboard_tabs {
