@@ -2,7 +2,7 @@
 
 A Looker extension that creates tabbed dashboards with advanced navigation, global filters, and printing. It transforms Looker into a tabbed interface, enabling seamless switching between dashboards while preserving filters and context. Supports folder and board navigation, plus printing functionality.
 
-![Dashboard Tabs](./extension.png)
+![Dashboard Tabs](assets/extension.png)
 
 ## Features
 
