@@ -4,6 +4,34 @@ A Looker extension that creates tabbed dashboards with advanced navigation, glob
 
 ![Dashboard Tabs](assets/extension.png)
 
+## Use it now
+
+Add this to any of your projects' `manifest.lkml` files.
+
+```
+application: dashboard_tabs {
+  label: "Dashboard Tabs"
+  url: "https://cdn.lkr.dev/apps/dashboard-tabs/latest/bundle.js"
+  entitlements: {
+    core_api_methods: [
+      "me", 
+      "dashboard", 
+      "search_dashboards", 
+      "folder_dashboards", 
+      "board", 
+      "search_boards", 
+      "folder", 
+      "search_folders"
+    ]
+    navigation: yes
+    use_embeds: yes
+    use_iframes: yes
+    new_window: yes
+    use_form_submit: yes
+  }
+}
+```
+
 ## Features
 
 ### 🎯 Core Functionality
