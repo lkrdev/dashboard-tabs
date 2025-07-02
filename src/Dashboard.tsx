@@ -4,9 +4,10 @@ import React, { useCallback } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useAppContext } from "./AppContext";
-import { useExtensionContextData } from "./hooks/useExtensionContext";
+import useConfigContext from "./ConfigContext";
 import useExtensionSdk from "./hooks/useExtensionSdk";
 import useSdk from "./hooks/useSdk";
+import { THEME } from "./utils/constants";
 import { getBoardList } from "./utils/getBoardList";
 import { urlToRecord } from "./utils/urlToRecord";
 
@@ -22,7 +23,7 @@ const StyledCard = styled(Card)`
 
 const Dashboard: React.FC = () => {
   const {
-    setGlobalFilters,
+    updateGlobalFilters,
     setDashboard,
     global_filters,
     folder_id,
@@ -31,7 +32,7 @@ const Dashboard: React.FC = () => {
     selected_dashboard_id,
   } = useAppContext();
   const extension_sdk = useExtensionSdk();
-  const { config_data } = useExtensionContextData();
+  const { config } = useConfigContext();
   const sdk = useSdk();
 
   const folder_dashboards = useSWR(
@@ -57,7 +58,7 @@ const Dashboard: React.FC = () => {
               (item) => item.type === "dashboard"
             )?.id;
           } else {
-            initial_dashboard = config_data.dashboards?.[0];
+            initial_dashboard = config.dashboards?.[0];
           }
         }
 
@@ -69,14 +70,12 @@ const Dashboard: React.FC = () => {
         }
         embed_sdk
           .createDashboardWithId(initial_dashboard)
-          .withParams(global_filters)
+          .withParams({ ...global_filters, ...THEME })
           .appendTo(el)
           .on("page:changed", (event: any) => {
             if (event?.page?.absoluteUrl?.length) {
-              const record = urlToRecord(event.page.absoluteUrl);
-              setGlobalFilters((previous_filter) => {
-                return { ...previous_filter, ...record };
-              });
+              const items = urlToRecord(event.page.absoluteUrl);
+              updateGlobalFilters(items.filters);
             }
           })
           .build()
@@ -91,15 +90,14 @@ const Dashboard: React.FC = () => {
     },
     [
       extension_sdk,
-      setGlobalFilters,
+      updateGlobalFilters,
       setDashboard,
       folder_dashboards.data,
       board.data,
+      selected_dashboard_id,
     ]
   );
-  return (
-    <StyledCard p="xsmall" raised borderRadius="large" ref={dashboardRef} />
-  );
+  return <StyledCard raised borderRadius="large" ref={dashboardRef} />;
 };
 
 export default Dashboard;

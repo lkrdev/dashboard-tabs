@@ -5,7 +5,7 @@ import useSWR, { State, useSWRConfig } from "swr";
 import { useBoolean } from "usehooks-ts";
 import { useAppContext } from "../AppContext";
 import ProgressIndicator from "../components/ProgressIndicator";
-import { useExtensionContextData } from "../hooks/useExtensionContext";
+import useConfigContext from "../ConfigContext";
 import useExtensionSdk from "../hooks/useExtensionSdk";
 import useSdk from "../hooks/useSdk";
 import { getBoardList } from "../utils/getBoardList";
@@ -36,7 +36,7 @@ export const PrintAll = () => {
 
   const running = useBoolean(false);
   const { global_filters, folder_id, board_id } = useAppContext();
-  const { config_data } = useExtensionContextData();
+  const { config: config_data } = useConfigContext();
   const sdk = useSdk();
 
   const folder_dashboards = useSWR(
