@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 export default function useSearchParams() {
   const { search } = useLocation();
@@ -7,26 +7,26 @@ export default function useSearchParams() {
     Object.fromEntries(new URLSearchParams(search))
   );
 
-  useEffect(() => {
-    history.replace({
-      search: new URLSearchParams(search_params).toString(),
-    });
-  }, [search_params, history]);
+  const updateSearchParams = useCallback(
+    (params: Record<string, string | undefined | null>) => {
+      const new_params = new URLSearchParams(search_params);
+      Object.entries(params).forEach(([key, value]) => {
+        if (value === undefined || value === null) {
+          new_params.delete(key);
+        } else {
+          new_params.set(key, value);
+        }
+      });
+      setSearchParams(Object.fromEntries(new_params.entries()));
+      history.replace({
+        search: new_params.toString(),
+      });
+    },
+    [setSearchParams, history, search_params]
+  );
 
   return {
     search_params,
-    updateSearchParams: (params: Record<string, string | undefined | null>) => {
-      setSearchParams((previous) => {
-        const new_params = new URLSearchParams(previous);
-        Object.entries(params).forEach(([key, value]) => {
-          if (value === undefined || value === null) {
-            new_params.delete(key);
-          } else {
-            new_params.set(key, value);
-          }
-        });
-        return Object.fromEntries(new_params.entries());
-      });
-    },
+    updateSearchParams,
   };
 }

@@ -16,6 +16,7 @@
     "@looker/embed-sdk": "^2.0.1",
     "@looker/extension-sdk": "^25.4.0",
     "@looker/extension-sdk-react": "^25.4.0",
+    "@styled-icons/material": "^10.47.0",
     "formik": "^2.4.6",
     "html-webpack-plugin": "^5.6.3",
     "react": "^17.0.2",

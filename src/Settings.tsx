@@ -19,10 +19,7 @@ import useSWR from "swr";
 import { useBoolean, useDebounceValue } from "usehooks-ts";
 import { useAppContext } from "./AppContext";
 import { useToast } from "./components/Toast/ToastContext";
-import {
-  IExtensionContextData,
-  useExtensionContextData,
-} from "./hooks/useExtensionContext";
+import useConfigContext, { IExtensionConfig } from "./ConfigContext";
 import useSdk from "./hooks/useSdk";
 
 const Settings: React.FC = () => {
@@ -43,11 +40,11 @@ const Settings: React.FC = () => {
   );
   const { is_admin } = useAppContext();
   const {
-    config_data,
-    updateValues,
-    checkCurrentUserCanUpdateSettings,
+    config: config_data,
+    updateConfig,
     can_update_settings,
-  } = useExtensionContextData();
+    checkCurrentUserCanUpdateSettings,
+  } = useConfigContext();
 
   const { values, ...formik } = useFormik({
     validateOnChange: false,
@@ -55,15 +52,17 @@ const Settings: React.FC = () => {
     initialValues: {
       dashboards: config_data.dashboards || [],
       restrict_settings: config_data.restrict_settings || false,
-      print_all_dashboards: config_data.print_all_dashboards || false,
+      print_all_dashboards: config_data.print_all_dashboards || true,
       setting_group_ids: config_data.setting_group_ids || [],
       label: config_data.label || "",
-      enable_folder_navigation: config_data.enable_folder_navigation || false,
-      enable_board_navigation: config_data.enable_board_navigation || false,
-    } as IExtensionContextData,
+      enable_folder_navigation: config_data.enable_folder_navigation || true,
+      enable_board_navigation: config_data.enable_board_navigation || true,
+      allow_adhoc_dashboards: config_data.allow_adhoc_dashboards || true,
+      save_board_from_adhoc_dashboards:
+        config_data.save_board_from_adhoc_dashboards || true,
+    } as IExtensionConfig,
     validate: async (values) => {
-      let errors: Partial<{ [key in keyof IExtensionContextData]: string }> =
-        {};
+      let errors: Partial<{ [key in keyof IExtensionConfig]: string }> = {};
       if (values.restrict_settings) {
         if (!is_admin) {
           const check = checkCurrentUserCanUpdateSettings(
@@ -78,11 +77,8 @@ const Settings: React.FC = () => {
       return errors;
     },
     onSubmit: (values) => {
-      updateValues(values);
-      showSuccess(
-        "Settings updated, please refresh the page to see the changes",
-        5000
-      );
+      updateConfig({ ...values });
+      showSuccess("Settings updated", 5000);
     },
   });
   useEffect(() => {
@@ -112,7 +108,9 @@ const Settings: React.FC = () => {
               <InputText
                 name="label"
                 value={values.label}
-                onChange={(e) => formik.setFieldValue("label", e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  formik.setFieldValue("label", e.target.value)
+                }
               />
             </Space>
             <Space>
@@ -132,7 +130,7 @@ const Settings: React.FC = () => {
                 label: d.title!,
               }))}
               onChange={(value: string) => setDebouncedSearch(value)}
-              onSelectOption={(v) =>
+              onSelectOption={(v: { value: string }) =>
                 formik.setFieldValue("dashboards", [
                   ...(values.dashboards || []),
                   v!.value,
@@ -146,7 +144,7 @@ const Settings: React.FC = () => {
               <Checkbox
                 name="print_all_dashboards"
                 checked={values.print_all_dashboards || false}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   formik.setFieldValue(
                     "print_all_dashboards",
                     e.target.checked
@@ -168,7 +166,7 @@ const Settings: React.FC = () => {
               <Checkbox
                 name="enable_folder_navigation"
                 checked={values.enable_folder_navigation || false}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   formik.setFieldValue(
                     "enable_folder_navigation",
                     e.target.checked
@@ -188,9 +186,31 @@ const Settings: React.FC = () => {
             </Space>
             <Space>
               <Checkbox
+                name="allow_adhoc_dashboards"
+                checked={values.allow_adhoc_dashboards || false}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  formik.setFieldValue(
+                    "allow_adhoc_dashboards",
+                    e.target.checked
+                  );
+                }}
+              />
+              <Label
+                onClick={() => {
+                  formik.setFieldValue(
+                    "allow_adhoc_dashboards",
+                    !values.allow_adhoc_dashboards
+                  );
+                }}
+              >
+                Allow Adhoc Dashboards
+              </Label>
+            </Space>
+            <Space>
+              <Checkbox
                 name="enable_board_navigation"
                 checked={values.enable_board_navigation || false}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   formik.setFieldValue(
                     "enable_board_navigation",
                     e.target.checked
@@ -208,12 +228,37 @@ const Settings: React.FC = () => {
                 Enable Board Navigation
               </Label>
             </Space>
+            {values.allow_adhoc_dashboards &&
+              values.enable_board_navigation && (
+                <Space>
+                  <Checkbox
+                    name="save_board_from_adhoc_dashboards"
+                    checked={values.save_board_from_adhoc_dashboards || false}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      formik.setFieldValue(
+                        "save_board_from_adhoc_dashboards",
+                        e.target.checked
+                      );
+                    }}
+                  />
+                  <Label
+                    onClick={() => {
+                      formik.setFieldValue(
+                        "save_board_from_adhoc_dashboards",
+                        !values.save_board_from_adhoc_dashboards
+                      );
+                    }}
+                  >
+                    Save Board from Adhoc Dashboards
+                  </Label>
+                </Space>
+              )}
             <Divider />
             <Space>
               <Checkbox
                 name="restrict_settings"
                 checked={values.restrict_settings}
-                onChange={(e) => {
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   formik.setFieldValue("restrict_settings", e.target.checked);
                 }}
               />

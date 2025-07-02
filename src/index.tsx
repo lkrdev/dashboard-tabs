@@ -5,6 +5,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import { AppContextProvider } from "./AppContext";
+import { ConfigContextProvider } from "./ConfigContext";
 import { ToastProvider } from "./components/Toast/ToastContext";
 import "./index.css";
 
@@ -19,11 +20,9 @@ const mountApp = () => {
   let root = document.getElementById(rootId);
 
   if (!root) {
-    root = document.createElement("div");
+    root = document.createElement("div") as HTMLDivElement;
     root.id = rootId;
-    root.style.height = "100%";
-    root.style.display = "flex";
-    document.body.style.margin = "0";
+    root.style = "height: 100%; display: flex; margin: 0;";
     document.body.appendChild(root);
   }
 
@@ -31,9 +30,11 @@ const mountApp = () => {
     <ExtensionProvider>
       <ComponentsProvider>
         <AppContextProvider>
-          <ToastProvider>
-            <App />
-          </ToastProvider>
+          <ConfigContextProvider>
+            <ToastProvider>
+              <App />
+            </ToastProvider>
+          </ConfigContextProvider>
         </AppContextProvider>
       </ComponentsProvider>
     </ExtensionProvider>,

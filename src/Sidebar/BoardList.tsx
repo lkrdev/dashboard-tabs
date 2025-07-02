@@ -9,6 +9,7 @@ import React, { useMemo } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useAppContext } from "../AppContext";
+import Skeleton from "../components/Skeleton";
 import useSdk from "../hooks/useSdk";
 import { getBoardList, IBoardList } from "../utils/getBoardList";
 
@@ -26,7 +27,13 @@ const DashboardItem = ({ id }: IBoardList) => {
       }}
       itemRole="link"
     >
-      {db.data?.title}
+      {db.isLoading ? (
+        <Skeleton show={true} width="100%" color="transparent" height="100%">
+          Loading...
+        </Skeleton>
+      ) : (
+        <>{db.data?.title}</>
+      )}
     </ListItem>
   );
 };
