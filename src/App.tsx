@@ -1,13 +1,28 @@
 import { Box } from "@looker/components";
 import React from "react";
 import { useAppContext } from "./AppContext";
+import LkrLoading from "./components/LkrLoading";
+import useConfigContext from "./ConfigContext";
 import Dashboard from "./Dashboard";
 import Sidebar from "./Sidebar";
 
 const App: React.FC = () => {
   const { isLoading, me } = useAppContext();
+  const {
+    config: { remove_branded_loading },
+  } = useConfigContext();
   if (isLoading) {
-    return <Box>Loading...</Box>;
+    return (
+      <Box
+        height="100vh"
+        width="100vw"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        {!Boolean(remove_branded_loading) && <LkrLoading duration={750} />}
+      </Box>
+    );
   } else if (me) {
     return (
       <>

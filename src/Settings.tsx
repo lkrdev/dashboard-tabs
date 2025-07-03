@@ -281,6 +281,20 @@ const Settings: React.FC = () => {
                 {formik.errors.setting_group_ids}
               </Span>
             )}
+            <Divider />
+            <Space>
+              <Checkbox
+                name="remove_branded_loading"
+                checked={values.remove_branded_loading}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  formik.setFieldValue(
+                    "remove_branded_loading",
+                    e.target.checked
+                  );
+                }}
+              />
+              <Label>Remove Branded Loading</Label>
+            </Space>
           </SpaceVertical>
         </DialogContent>
       </Dialog>

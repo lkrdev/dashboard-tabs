@@ -25,7 +25,6 @@ const Dashboard: React.FC = () => {
   const {
     updateGlobalFilters,
     setDashboard,
-    global_filters,
     folder_id,
     board_id,
     changeDashboardId,
@@ -34,6 +33,7 @@ const Dashboard: React.FC = () => {
   const extension_sdk = useExtensionSdk();
   const { config } = useConfigContext();
   const sdk = useSdk();
+  const { getSearchParams } = useAppContext();
 
   const folder_dashboards = useSWR(
     folder_id?.length ? `folder-dashboards-${folder_id}` : null,
@@ -68,6 +68,7 @@ const Dashboard: React.FC = () => {
         if (!selected_dashboard_id) {
           changeDashboardId(initial_dashboard, true);
         }
+        const global_filters = getSearchParams(true);
         embed_sdk
           .createDashboardWithId(initial_dashboard)
           .withParams({ ...global_filters, ...THEME })

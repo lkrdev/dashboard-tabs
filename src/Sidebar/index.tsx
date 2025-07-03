@@ -2,19 +2,16 @@ import {
   Box,
   Card,
   Header,
-  IconButton,
   List,
   ListItem,
   SpaceVertical,
   Span,
 } from "@looker/components";
-import { Delete } from "@styled-icons/material";
 import React, { useMemo } from "react";
 import Balancer from "react-wrap-balancer";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useAppContext } from "../AppContext";
-import Skeleton from "../components/Skeleton";
 import useConfigContext from "../ConfigContext";
 import useSdk from "../hooks/useSdk";
 import Settings from "../Settings";
@@ -22,8 +19,10 @@ import { getBoardList } from "../utils/getBoardList";
 import AdhocDashboard from "./AdhocDashboard";
 import BoardList from "./BoardList";
 import BoardNavigation from "./BoardNavigation";
+import DashboardItem from "./DashboardItem";
 import FolderNavigation from "./FolderNavigation";
 import { PrintAll } from "./PrintAll";
+import SaveAdhocDashboard from "./SaveAdhocDashboard";
 import SwitchToAdhocDashboard from "./SwitchToAdhocDashboard";
 
 const StyledListItem = styled(ListItem)`
@@ -59,11 +58,20 @@ const Sidebar: React.FC = () => {
     sdk.ok(sdk.board(board_id!))
   );
 
-  const show_dashboards = adhoc_dashboard_ids
-    ? adhoc_dashboard_ids
+  const type = adhoc_dashboard_ids
+    ? "adhoc"
     : folder_id?.length
-    ? folder_dashboards.data?.map((d) => d.id!) || []
-    : dashboard_ids;
+    ? "folder"
+    : board_id?.length
+    ? "board"
+    : "default";
+
+  const show_dashboards =
+    type === "adhoc"
+      ? adhoc_dashboard_ids
+      : type === "folder"
+      ? folder_dashboards.data?.map((d) => d.id!) || []
+      : dashboard_ids;
 
   const header_title = useMemo(() => {
     if (folder?.data?.name) {
@@ -88,14 +96,26 @@ const Sidebar: React.FC = () => {
           <Balancer>{header_title}</Balancer>
         </Span>
       </Header>
-      {board_id?.length ? (
-        <BoardList />
-      ) : (
-        <List>
-          {show_dashboards.map((dashboard_id: string) => {
-            return <Item key={dashboard_id} dashboard_id={dashboard_id} />;
-          })}
-        </List>
+      {type === "board" && <BoardList />}
+      {type !== "board" && (
+        <>
+          {show_dashboards!.length === 0 ? (
+            <Span p="xsmall" fontSize="xsmall">
+              No default dashboards found
+            </Span>
+          ) : (
+            <List>
+              {show_dashboards!.map((dashboard_id: string) => {
+                return (
+                  <DashboardItem
+                    key={dashboard_id}
+                    dashboard_id={dashboard_id}
+                  />
+                );
+              })}
+            </List>
+          )}
+        </>
       )}
       {adhoc_dashboard_ids && <AdhocDashboard />}
       <Box flexGrow={1} />
@@ -116,54 +136,12 @@ const Sidebar: React.FC = () => {
         )}
         {Boolean(config_data?.enable_folder_navigation) && <FolderNavigation />}
         {Boolean(config_data?.enable_board_navigation) && <BoardNavigation />}
+        {Boolean(config_data?.save_board_from_adhoc_dashboards) && (
+          <SaveAdhocDashboard />
+        )}
         {Boolean(config_data?.print_all_dashboards) && <PrintAll />}
       </SpaceVertical>
     </Card>
-  );
-};
-
-const Item = ({ dashboard_id }: { dashboard_id: string }) => {
-  const {
-    selected_dashboard_id,
-    adhoc_dashboard_ids,
-    changeDashboardId,
-    toggleAdhocDashboardId,
-  } = useAppContext();
-  const sdk = useSdk();
-  const db = useSWR(`dashboard-${dashboard_id}`, () =>
-    sdk.ok(sdk.dashboard(dashboard_id, "id,title"))
-  );
-  const is_adhoc = Boolean(adhoc_dashboard_ids);
-  return (
-    <StyledListItem
-      itemRole="link"
-      selected={selected_dashboard_id === dashboard_id}
-      onClick={() => {
-        changeDashboardId(dashboard_id);
-      }}
-      detail={
-        is_adhoc ? (
-          <IconButton
-            className="remove-button"
-            icon={<Delete />}
-            onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
-              e.stopPropagation();
-              e.preventDefault();
-              toggleAdhocDashboardId(dashboard_id);
-            }}
-            label="Remove"
-          />
-        ) : null
-      }
-    >
-      {db.isLoading ? (
-        <Skeleton show={true} width="100%" color="transparent" height="100%">
-          Loading...
-        </Skeleton>
-      ) : (
-        <>{db.data?.title || dashboard_id}</>
-      )}
-    </StyledListItem>
   );
 };
 

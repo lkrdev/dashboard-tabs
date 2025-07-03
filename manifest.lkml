@@ -10,7 +10,10 @@ application: dashboard_tabs {
       "board", 
       "search_boards", 
       "folder", 
-      "search_folders"
+      "search_folders",
+      "create_board",
+      "create_board_section",
+      "create_board_item"
     ]
     navigation: yes
     use_embeds: yes

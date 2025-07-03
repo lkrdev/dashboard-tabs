@@ -35,8 +35,9 @@ export const PrintAll = () => {
   const extension_sdk = useExtensionSdk();
 
   const running = useBoolean(false);
-  const { global_filters, folder_id, board_id } = useAppContext();
+  const { folder_id, board_id } = useAppContext();
   const { config: config_data } = useConfigContext();
+  const { getSearchParams } = useAppContext();
   const sdk = useSdk();
 
   const folder_dashboards = useSWR(
@@ -75,15 +76,10 @@ export const PrintAll = () => {
       const filename = cached_data?.data?.title?.length
         ? cached_data.data.title
         : `dashboard_${dashboard_id}`;
-      const {
-        dashboard_id: db_id,
-        sandboxed_host,
-        ...filters
-      } = global_filters;
       const url = getDashboardRenderUrl(
         dashboard_id,
         filename + ".pdf",
-        filters
+        getSearchParams(true)
       );
       extension_sdk.openBrowserWindow(url, "_blank");
     }
