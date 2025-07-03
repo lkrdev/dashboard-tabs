@@ -26,6 +26,7 @@ export interface IExtensionConfig {
   setting_group_ids?: string[];
   restrict_settings?: boolean;
   label?: string;
+  remove_branded_loading?: boolean;
   print_all_dashboards?: boolean;
   enable_folder_navigation?: boolean;
   enable_board_navigation?: boolean;
@@ -61,6 +62,7 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const config_data_with_defaults = useMemo(
     () => ({
       ...config_data,
+      remove_branded_loading: config_data.remove_branded_loading ?? false,
       print_all_dashboards: config_data.print_all_dashboards ?? true,
       enable_folder_navigation: config_data.enable_folder_navigation ?? true,
       enable_board_navigation: config_data.enable_board_navigation ?? true,

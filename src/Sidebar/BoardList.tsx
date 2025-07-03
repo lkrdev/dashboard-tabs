@@ -48,6 +48,9 @@ const StyledDivider = styled(Divider)`
 `;
 
 const SectionItem = ({ title, description }: IBoardList) => {
+  if (title === "Section") {
+    return null;
+  }
   return (
     <>
       <StyledDivider />

@@ -1,12 +1,10 @@
 import { ILookerConnection } from "@looker/embed-sdk";
 import { IUser } from "@looker/sdk";
-import React, { createContext, useContext, useMemo } from "react";
+import React, { createContext, useContext, useMemo, useRef } from "react";
 import { useHistory, useLocation } from "react-router-dom";
 import useSWR from "swr";
 import { ToastProvider } from "./components/Toast/ToastContext";
 import useSdk from "./hooks/useSdk";
-import useSearchParams from "./hooks/useSearchParams";
-import { THEME } from "./utils/constants";
 
 export type GlobalFilters = { [key: string]: string };
 
@@ -17,7 +15,6 @@ interface AppContextType {
   setDashboard: React.Dispatch<
     React.SetStateAction<ILookerConnection | undefined>
   >;
-  global_filters: GlobalFilters;
   updateGlobalFilters: (filters: GlobalFilters) => void;
   folder_id?: string;
   board_id?: string;
@@ -26,6 +23,12 @@ interface AppContextType {
   is_admin: boolean;
   adhoc_dashboard_ids?: string[];
   toggleAdhocDashboardId: (id: string) => void;
+  current_search_ref: React.MutableRefObject<Record<string, string>>;
+  getSearchParams: (global_filters?: boolean) => Record<string, string>;
+  updateSearchParams: (
+    params: Record<string, string | undefined | null>,
+    global_filters?: boolean
+  ) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -33,17 +36,17 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { search_params, updateSearchParams } = useSearchParams();
+  const location = useLocation();
   const sdk = useSdk();
   const { data: me, isLoading, error } = useSWR("me", () => sdk.ok(sdk.me()));
   const [dashboard, setDashboard] = React.useState<ILookerConnection>();
-  const [global_filters, setGlobalFilters] =
-    React.useState<GlobalFilters>(search_params);
+  const current_search_ref = useRef(
+    Object.fromEntries(new URLSearchParams(location.search))
+  );
   const [selected_dashboard_id, setSelectedDashboardId] = React.useState<
     string | undefined
-  >(search_params.dashboard_id);
+  >(current_search_ref.current.dashboard_id);
 
-  const location = useLocation();
   const history = useHistory();
   const folder_id = location.pathname.startsWith("/folders/")
     ? location.pathname.split("/")[2]
@@ -68,6 +71,33 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
     return Boolean(me?.role_ids?.includes("2"));
   }, [me]);
 
+  const getSearchParams = (global_filters?: boolean) => {
+    if (global_filters) {
+      const { dashboard_id, sandboxed_host, sdk, _theme, ...global_filters } =
+        current_search_ref.current;
+      return global_filters;
+    } else {
+      return current_search_ref.current;
+    }
+  };
+
+  const updateSearchParams = (
+    params: Record<string, string | undefined | null>
+  ) => {
+    const new_params = new URLSearchParams({
+      ...getSearchParams(false),
+    });
+    Object.entries(params).forEach(([key, value]) => {
+      if (value === undefined || value === null) {
+        new_params.delete(key);
+      } else {
+        new_params.set(key, value);
+      }
+    });
+    current_search_ref.current = Object.fromEntries(new_params);
+    history.push({ search: new_params.toString() });
+  };
+
   const changeDashboardId = (id: string | null, skip_load: boolean = false) => {
     if (id) {
       setSelectedDashboardId(id);
@@ -83,7 +113,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
         dashboard?.loadDashboard(
           id +
             "?" +
-            Object.entries({ ...global_filters, ...THEME })
+            Object.entries(current_search_ref.current)
               .map(([key, value]) => `${key}=${value}`)
               .join("&")
         );
@@ -96,8 +126,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const toggleAdhocDashboardId = (id: string) => {
     let extension_path = new Set(location.pathname.split("/").splice(2) || []);
     const on_path = extension_path.has(id);
-    const { dashboard_id, ...original_search_params } = search_params;
-    const new_search = new URLSearchParams(original_search_params);
+    const new_search = new URLSearchParams(current_search_ref.current);
     if (on_path) {
       extension_path.delete(id);
     } else {
@@ -115,7 +144,6 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
         changeDashboardId(current);
       } else {
         const first_id = Array.from(extension_path)[0];
-        // new_search.set("dashboard_id", first_id);
         changeDashboardId(first_id);
       }
     }
@@ -130,12 +158,7 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   const updateGlobalFilters = (filters: GlobalFilters) => {
-    const { dashboard_id, _theme, ...new_filters } = {
-      ...global_filters,
-      ...filters,
-    };
-    setGlobalFilters(new_filters);
-    updateSearchParams(new_filters);
+    updateSearchParams(filters);
   };
 
   return (
@@ -145,7 +168,6 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
         isLoading,
         dashboard,
         setDashboard,
-        global_filters,
         updateGlobalFilters,
         folder_id,
         board_id,
@@ -154,6 +176,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
         is_admin,
         adhoc_dashboard_ids,
         toggleAdhocDashboardId,
+        current_search_ref,
+        getSearchParams,
+        updateSearchParams,
       }}
     >
       <ToastProvider>{children}</ToastProvider>
