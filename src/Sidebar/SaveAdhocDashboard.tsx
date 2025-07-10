@@ -131,11 +131,7 @@ const AdhocDashboard: React.FC = () => {
         </PopoverLayout>
       }
     >
-      <ButtonOutline
-        fullWidth
-        onClick={() => open.setTrue()}
-        disabled={!adhoc_dashboard_ids || adhoc_dashboard_ids.length === 0}
-      >
+      <ButtonOutline fullWidth onClick={() => open.setTrue()}>
         Save as Board
       </ButtonOutline>
     </Popover>
