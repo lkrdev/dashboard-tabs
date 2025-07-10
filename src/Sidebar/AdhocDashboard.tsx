@@ -92,7 +92,7 @@ const AdhocDashboard: React.FC = () => {
         </PopoverLayout>
       }
     >
-      <ButtonOutline mt="xsmall" fullWidth>
+      <ButtonOutline mt="xsmall" fullWidth color="neutral">
         Add Dashboard
       </ButtonOutline>
     </Popover>

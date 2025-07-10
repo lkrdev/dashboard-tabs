@@ -18,7 +18,7 @@ const SwitchToAdhocDashboard: React.FC<{ current_dashboard_ids: string[] }> = ({
     history.push(`${path}?${search}`);
   };
   return (
-    <ButtonOutline fullWidth onClick={handleSwitch}>
+    <ButtonOutline fullWidth onClick={handleSwitch} color="neutral">
       Switch to Adhoc Dashboards
     </ButtonOutline>
   );

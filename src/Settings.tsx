@@ -64,6 +64,8 @@ const Settings: React.FC = () => {
       allow_adhoc_dashboards: config_data.allow_adhoc_dashboards || true,
       save_board_from_adhoc_dashboards:
         config_data.save_board_from_adhoc_dashboards || true,
+      background_color: config_data.background_color,
+      paper_color: config_data.paper_color,
     } as IExtensionConfig,
     validate: async (values) => {
       let errors: Partial<{ [key in keyof IExtensionConfig]: string }> = {};
@@ -93,7 +95,7 @@ const Settings: React.FC = () => {
 
   return (
     <>
-      <ButtonOutline fullWidth onClick={() => open.setTrue()}>
+      <ButtonOutline fullWidth onClick={() => open.setTrue()} color="neutral">
         Settings
       </ButtonOutline>
       <Dialog
@@ -304,6 +306,41 @@ const Settings: React.FC = () => {
                 {formik.errors.setting_group_ids}
               </Span>
             )}
+            <Divider />
+            <Space width="250px" between>
+              <Label>Background Color</Label>
+              <input
+                type="color"
+                value={values.background_color || "#A3B3C9"}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  formik.setFieldValue("background_color", e.target.value)
+                }
+                style={{
+                  width: "50px",
+                  height: "30px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              />
+            </Space>
+            <Space width="250px" between>
+              <Label>Paper Color</Label>
+              <input
+                type="color"
+                value={values.paper_color || "#ffffff"}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                  formik.setFieldValue("paper_color", e.target.value)
+                }
+                style={{
+                  width: "50px",
+                  height: "30px",
+                  border: "1px solid #ccc",
+                  borderRadius: "4px",
+                  cursor: "pointer",
+                }}
+              />
+            </Space>
             <Divider />
             <Space>
               <Checkbox

@@ -189,7 +189,7 @@ const FolderNavigation: React.FC = () => {
         </PopoverLayout>
       }
     >
-      <ButtonOutline onClick={open.setTrue} fullWidth>
+      <ButtonOutline onClick={open.setTrue} fullWidth color="neutral">
         {"Open Folder"}
       </ButtonOutline>
     </Popover>

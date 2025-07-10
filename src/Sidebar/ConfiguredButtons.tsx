@@ -129,6 +129,7 @@ const ConfiguredButtons: React.FC = () => {
           iconAfter={<ChevronRight size={16} />}
           onClick={() => popoverOpen.setTrue()}
           fullWidth
+          color="neutral"
         >
           Actions
         </ButtonOutline>

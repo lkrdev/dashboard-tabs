@@ -88,7 +88,7 @@ export const PrintAll = () => {
 
   return (
     <Box flexGrow={1} width="100%">
-      <Button fullWidth onClick={handlePrintAll}>
+      <Button fullWidth onClick={handlePrintAll} color="neutral">
         Print All Dashboards
       </Button>
       <ProgressIndicator show={running.value} width="100%" />
