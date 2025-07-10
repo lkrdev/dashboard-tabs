@@ -1,12 +1,4 @@
-import {
-  Box,
-  Card,
-  Header,
-  List,
-  ListItem,
-  SpaceVertical,
-  Span,
-} from "@looker/components";
+import { Box, Card, Header, List, ListItem, Span } from "@looker/components";
 import React, { useMemo } from "react";
 import Balancer from "react-wrap-balancer";
 import styled from "styled-components";
@@ -14,16 +6,10 @@ import useSWR from "swr";
 import { useAppContext } from "../AppContext";
 import useConfigContext from "../ConfigContext";
 import useSdk from "../hooks/useSdk";
-import Settings from "../Settings";
-import { getBoardList } from "../utils/getBoardList";
 import AdhocDashboard from "./AdhocDashboard";
 import BoardList from "./BoardList";
-import BoardNavigation from "./BoardNavigation";
+import ConfiguredButtons from "./ConfiguredButtons";
 import DashboardItem from "./DashboardItem";
-import FolderNavigation from "./FolderNavigation";
-import { PrintAll } from "./PrintAll";
-import SaveAdhocDashboard from "./SaveAdhocDashboard";
-import SwitchToAdhocDashboard from "./SwitchToAdhocDashboard";
 
 const StyledListItem = styled(ListItem)`
   position: relative;
@@ -119,28 +105,7 @@ const Sidebar: React.FC = () => {
       )}
       {adhoc_dashboard_ids && <AdhocDashboard />}
       <Box flexGrow={1} />
-      <SpaceVertical gap="xsmall" width="100%">
-        {Boolean(can_update_settings) && <Settings />}
-        {Boolean(
-          config_data?.allow_adhoc_dashboards && !adhoc_dashboard_ids
-        ) && (
-          <SwitchToAdhocDashboard
-            current_dashboard_ids={
-              board_id?.length && board.data
-                ? getBoardList(board.data!)
-                    .filter((bl) => bl.type === "dashboard")
-                    .map((b) => b.id!)
-                : show_dashboards || []
-            }
-          />
-        )}
-        {Boolean(config_data?.enable_folder_navigation) && <FolderNavigation />}
-        {Boolean(config_data?.enable_board_navigation) && <BoardNavigation />}
-        {Boolean(config_data?.save_board_from_adhoc_dashboards) && (
-          <SaveAdhocDashboard />
-        )}
-        {Boolean(config_data?.print_all_dashboards) && <PrintAll />}
-      </SpaceVertical>
+      <ConfiguredButtons />
     </Card>
   );
 };
