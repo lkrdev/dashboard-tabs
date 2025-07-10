@@ -95,7 +95,7 @@ const Settings: React.FC = () => {
 
   return (
     <>
-      <ButtonOutline fullWidth onClick={() => open.setTrue()}>
+      <ButtonOutline fullWidth onClick={() => open.setTrue()} color="neutral">
         Settings
       </ButtonOutline>
       <Dialog

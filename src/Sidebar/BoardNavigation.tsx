@@ -131,7 +131,11 @@ const BoardNavigation: React.FC = () => {
         </PopoverLayout>
       }
     >
-      <ButtonOutline fullWidth onClick={() => is_open.setTrue()}>
+      <ButtonOutline
+        fullWidth
+        onClick={() => is_open.setTrue()}
+        color="neutral"
+      >
         Open Board
       </ButtonOutline>
     </Popover>

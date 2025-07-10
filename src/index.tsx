@@ -8,6 +8,8 @@ import { AppContextProvider } from "./AppContext";
 import useConfigContext, { ConfigContextProvider } from "./ConfigContext";
 import { ToastProvider } from "./components/Toast/ToastContext";
 import "./index.css";
+import { getTextColor } from "./utils/colorUtils";
+import { DEFAULT_DASHBOARD_PAPER_COLOR } from "./utils/constants";
 
 declare module "@looker/embed-sdk" {
   interface ILookerConnection {
@@ -46,13 +48,16 @@ const ComponentsWrapper = ({ children }: { children: React.ReactNode }) => {
   const {
     config: { background_color, paper_color },
   } = useConfigContext();
+
   return (
     <ComponentsProvider
       themeCustomizations={{
         colors: {
           key: background_color,
-          background: paper_color || "#ffffff",
-          text: "#262D33",
+          background: paper_color || DEFAULT_DASHBOARD_PAPER_COLOR,
+          text: getTextColor(paper_color || DEFAULT_DASHBOARD_PAPER_COLOR),
+          title: getTextColor(paper_color || DEFAULT_DASHBOARD_PAPER_COLOR),
+          body: getTextColor(paper_color || DEFAULT_DASHBOARD_PAPER_COLOR),
         },
       }}
     >

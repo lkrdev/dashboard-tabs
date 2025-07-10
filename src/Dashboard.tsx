@@ -89,7 +89,6 @@ const Dashboard: React.FC = () => {
           changeDashboardId(initial_dashboard, true);
         }
         const global_filters = getSearchParams(true);
-        console.log(createDashboardTheme(config));
         embed_sdk
           .createDashboardWithId(initial_dashboard)
           .withParams({ ...global_filters, ...createDashboardTheme(config) })
