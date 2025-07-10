@@ -14,10 +14,11 @@ import {
   Span,
 } from "@looker/components";
 import { useFormik } from "formik";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import useSWR from "swr";
 import { useBoolean, useDebounceValue } from "usehooks-ts";
 import { useAppContext } from "./AppContext";
+import ProgressIndicator from "./components/ProgressIndicator";
 import { useToast } from "./components/Toast/ToastContext";
 import useConfigContext, { IExtensionConfig } from "./ConfigContext";
 import useSdk from "./hooks/useSdk";
@@ -26,6 +27,7 @@ const Settings: React.FC = () => {
   const { showSuccess } = useToast();
   const open = useBoolean(false);
   const [debounced_search, setDebouncedSearch] = useDebounceValue("", 500);
+  const [search, setSearch] = useState("");
   const sdk = useSdk();
   const searched_dashboards = useSWR(
     `debounced_search=${debounced_search}`,
@@ -33,7 +35,9 @@ const Settings: React.FC = () => {
       sdk.ok(
         sdk.search_dashboards({
           limit: 50,
-          title: debounced_search?.length ? `%${debounced_search}%` : undefined,
+          title: debounced_search?.length
+            ? `%${debounced_search.replace(/\s/g, "%")}%`
+            : undefined,
           sorts: "title",
         })
       )
@@ -85,6 +89,8 @@ const Settings: React.FC = () => {
     formik.resetForm({ values: config_data });
   }, [config_data]);
 
+  const isDebouncing = debounced_search !== search;
+
   return (
     <>
       <ButtonOutline fullWidth onClick={() => open.setTrue()}>
@@ -125,19 +131,32 @@ const Settings: React.FC = () => {
               />
             </Space>
             <InputSearch
-              options={searched_dashboards.data?.map((d) => ({
-                value: d.id!,
-                label: d.title!,
-              }))}
-              onChange={(value: string) => setDebouncedSearch(value)}
-              onSelectOption={(v: { value: string }) =>
-                formik.setFieldValue("dashboards", [
-                  ...(values.dashboards || []),
-                  v!.value,
-                ])
+              options={
+                isDebouncing
+                  ? []
+                  : searched_dashboards.data?.map((d) => ({
+                      value: d.id!,
+                      label: d.title!,
+                    }))
               }
+              value={search}
+              onChange={(value: string) => {
+                setDebouncedSearch(value);
+                setSearch(value);
+              }}
+              onSelectOption={(option) => {
+                if (option?.value) {
+                  formik.setFieldValue("dashboards", [
+                    ...(values.dashboards || []),
+                    option.value,
+                  ]);
+                }
+              }}
               changeOnSelect={false}
               placeholder="Search dashboards and click to add"
+            />
+            <ProgressIndicator
+              show={searched_dashboards.isLoading || isDebouncing}
             />
             <Divider />
             <Space>
@@ -266,8 +285,10 @@ const Settings: React.FC = () => {
             </Space>
             {Boolean(values.restrict_settings) && (
               <Space>
-                <Label>Group IDs allowed to update settings</Label>
+                <Label>Group IDs</Label>
                 <InputChips
+                  placeholder="Group IDs allowed to update settings (in addition to Looker
+                    admins)"
                   name="setting_group_ids"
                   values={values.setting_group_ids || []}
                   onChange={(values: string[]) =>
