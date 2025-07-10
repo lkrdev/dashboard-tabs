@@ -104,6 +104,8 @@ const Settings: React.FC = () => {
             await formik.handleSubmit();
             open.setFalse();
           }
+          setSearch("");
+          setDebouncedSearch("");
         }}
       >
         <DialogHeader>Settings</DialogHeader>
