@@ -1,6 +1,5 @@
 import { Box } from "@looker/components";
 import React from "react";
-import { useTheme } from "styled-components";
 import { useAppContext } from "./AppContext";
 import LkrLoading from "./components/LkrLoading";
 import useConfigContext from "./ConfigContext";
@@ -9,8 +8,6 @@ import Sidebar from "./Sidebar";
 
 const App: React.FC = () => {
   const { isLoading, me } = useAppContext();
-  const theme = useTheme();
-  console.log(theme);
 
   const {
     config: { remove_branded_loading, background_color },
