@@ -5,9 +5,13 @@ import styled from "styled-components";
 import useSWR from "swr";
 import { useAppContext } from "../AppContext";
 import Skeleton from "../components/Skeleton";
+import useConfigContext from "../ConfigContext";
 import useSdk from "../hooks/useSdk";
 
-const StyledListItem = styled(ListItem)`
+const StyledListItem = styled(ListItem)<{ paperColor?: string }>`
+  & > a {
+    background-color: ${({ paperColor }) => paperColor};
+  }
   position: relative;
   & .remove-button {
     display: none;
@@ -30,6 +34,9 @@ const DashboardItem = ({ dashboard_id }: { dashboard_id: string }) => {
     changeDashboardId,
     toggleAdhocDashboardId,
   } = useAppContext();
+  const {
+    config: { paper_color },
+  } = useConfigContext();
   const sdk = useSdk();
   const db = useSWR(`dashboard-${dashboard_id}`, () =>
     sdk.ok(sdk.dashboard(dashboard_id, "id,title"))
@@ -37,6 +44,7 @@ const DashboardItem = ({ dashboard_id }: { dashboard_id: string }) => {
   const is_adhoc = Boolean(adhoc_dashboard_ids);
   return (
     <StyledListItem
+      paperColor={paper_color}
       itemRole="link"
       selected={selected_dashboard_id === dashboard_id}
       onClick={() => {

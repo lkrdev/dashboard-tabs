@@ -70,13 +70,7 @@ const Sidebar: React.FC = () => {
   }, [folder?.data?.name, board?.data?.title, config_data.label]);
 
   return (
-    <Card
-      raised
-      position="relative"
-      backgroundColor="#B7C9E2"
-      p="xsmall"
-      borderRadius="large"
-    >
+    <Card raised position="relative" p="xsmall" borderRadius="large">
       <Header style={{ justifyContent: "space-between" }}>
         <Span p="xsmall" fontSize="xlarge">
           <Balancer>{header_title}</Balancer>

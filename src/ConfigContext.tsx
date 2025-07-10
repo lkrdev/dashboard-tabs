@@ -7,6 +7,10 @@ import React, {
 } from "react";
 import { useAppContext } from "./AppContext";
 import useExtensionSdk from "./hooks/useExtensionSdk";
+import {
+  DEFAULT_DASHBOARD_BACKGROUND_COLOR,
+  DEFAULT_DASHBOARD_PAPER_COLOR,
+} from "./utils/constants";
 
 type TConfigContext = {
   config: IExtensionConfig;
@@ -32,6 +36,8 @@ export interface IExtensionConfig {
   enable_board_navigation?: boolean;
   allow_adhoc_dashboards?: boolean;
   save_board_from_adhoc_dashboards?: boolean;
+  background_color?: string;
+  paper_color?: string;
 }
 
 export const ConfigContext = createContext<TConfigContext>({} as any);
@@ -51,11 +57,12 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const extension_sdk = useExtensionSdk();
   const [config_data, setConfigData] = useState<IExtensionConfig>({});
-  const { is_admin, me } = useAppContext();
+  const { is_admin, me, updateDashboardTheme } = useAppContext();
 
   useEffect(() => {
     const config_data: IExtensionConfig = extension_sdk.getContextData();
     setConfigData(config_data ?? {});
+    updateDashboardTheme(config_data);
   }, [extension_sdk]);
 
   // Computed property that provides defaulted boolean values
@@ -69,6 +76,9 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
       allow_adhoc_dashboards: config_data.allow_adhoc_dashboards ?? true,
       save_board_from_adhoc_dashboards:
         config_data.save_board_from_adhoc_dashboards ?? true,
+      background_color:
+        config_data.background_color ?? DEFAULT_DASHBOARD_BACKGROUND_COLOR,
+      paper_color: config_data.paper_color ?? DEFAULT_DASHBOARD_PAPER_COLOR,
     }),
     [config_data]
   );
@@ -109,6 +119,7 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
       }
     }
     setConfigData({ ...current });
+    updateDashboardTheme(current);
     extension_sdk.saveContextData(current);
     extension_sdk.refreshContextData();
   };

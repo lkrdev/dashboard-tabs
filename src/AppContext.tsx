@@ -5,8 +5,16 @@ import { useHistory, useLocation } from "react-router-dom";
 import useSWR from "swr";
 import { ToastProvider } from "./components/Toast/ToastContext";
 import useSdk from "./hooks/useSdk";
+import {
+  createDashboardTheme,
+  DEFAULT_DASHBOARD_BACKGROUND_COLOR,
+} from "./utils/constants";
 
 export type GlobalFilters = { [key: string]: string };
+
+type DashboardTheme = {
+  background_color?: string;
+};
 
 interface AppContextType {
   isLoading: boolean;
@@ -29,6 +37,7 @@ interface AppContextType {
     params: Record<string, string | undefined | null>,
     global_filters?: boolean
   ) => void;
+  updateDashboardTheme: (theme: DashboardTheme) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -40,6 +49,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const sdk = useSdk();
   const { data: me, isLoading, error } = useSWR("me", () => sdk.ok(sdk.me()));
   const [dashboard, setDashboard] = React.useState<ILookerConnection>();
+  const [dashboard_theme, setDashboardTheme] = React.useState<DashboardTheme>({
+    background_color: DEFAULT_DASHBOARD_BACKGROUND_COLOR,
+  });
+
   const current_search_ref = useRef(
     Object.fromEntries(new URLSearchParams(location.search))
   );
@@ -113,7 +126,12 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
         dashboard?.loadDashboard(
           id +
             "?" +
-            Object.entries(current_search_ref.current)
+            Object.entries(
+              Object.assign(
+                current_search_ref.current,
+                createDashboardTheme(dashboard_theme)
+              )
+            )
               .map(([key, value]) => `${key}=${value}`)
               .join("&")
         );
@@ -179,6 +197,9 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
         current_search_ref,
         getSearchParams,
         updateSearchParams,
+        updateDashboardTheme: (theme: DashboardTheme) => {
+          setDashboardTheme(theme);
+        },
       }}
     >
       <ToastProvider>{children}</ToastProvider>

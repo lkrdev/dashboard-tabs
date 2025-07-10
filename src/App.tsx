@@ -8,8 +8,9 @@ import Sidebar from "./Sidebar";
 
 const App: React.FC = () => {
   const { isLoading, me } = useAppContext();
+
   const {
-    config: { remove_branded_loading },
+    config: { remove_branded_loading, background_color },
   } = useConfigContext();
   if (isLoading) {
     return (
@@ -30,7 +31,7 @@ const App: React.FC = () => {
           p="medium"
           display="grid"
           height="100%"
-          backgroundColor="#A3B3C9"
+          backgroundColor={background_color}
           style={{ gridTemplateColumns: "300px 1fr", gap: "12px" }}
         >
           <Sidebar />

@@ -5,7 +5,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
 import { AppContextProvider } from "./AppContext";
-import { ConfigContextProvider } from "./ConfigContext";
+import useConfigContext, { ConfigContextProvider } from "./ConfigContext";
 import { ToastProvider } from "./components/Toast/ToastContext";
 import "./index.css";
 
@@ -28,17 +28,36 @@ const mountApp = () => {
 
   ReactDOM.render(
     <ExtensionProvider>
-      <ComponentsProvider>
-        <AppContextProvider>
-          <ConfigContextProvider>
+      <AppContextProvider>
+        <ConfigContextProvider>
+          <ComponentsWrapper>
             <ToastProvider>
               <App />
             </ToastProvider>
-          </ConfigContextProvider>
-        </AppContextProvider>
-      </ComponentsProvider>
+          </ComponentsWrapper>
+        </ConfigContextProvider>
+      </AppContextProvider>
     </ExtensionProvider>,
     root
+  );
+};
+
+const ComponentsWrapper = ({ children }: { children: React.ReactNode }) => {
+  const {
+    config: { background_color, paper_color },
+  } = useConfigContext();
+  return (
+    <ComponentsProvider
+      themeCustomizations={{
+        colors: {
+          key: background_color,
+          background: paper_color || "#ffffff",
+          text: "#262D33",
+        },
+      }}
+    >
+      {children}
+    </ComponentsProvider>
   );
 };
 
