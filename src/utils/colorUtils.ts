@@ -14,6 +14,19 @@ const hexToRgb = (hex: string): [number, number, number] => {
     : [0, 0, 0];
 };
 
+// Convert RGB to hex
+const rgbToHex = (r: number, g: number, b: number): string => {
+  return (
+    "#" +
+    [r, g, b]
+      .map((x) => {
+        const hex = x.toString(16);
+        return hex.length === 1 ? "0" + hex : hex;
+      })
+      .join("")
+  );
+};
+
 // Calculate relative luminance
 const getLuminance = (r: number, g: number, b: number): number => {
   const [rs, gs, bs] = [r, g, b].map((c) => {
@@ -76,4 +89,37 @@ export const meetsWCAGContrast = (
   };
 
   return ratio >= thresholds[level][size];
+};
+
+/**
+ * Make a color lighter if it's dark, or darker if it's light.
+ * @param color - The hex color string (e.g. "#aabbcc")
+ * @param amount - The amount to lighten/darken (0-1, default 0.2)
+ * @returns The adjusted hex color string
+ */
+export const adjustColorLightness = (
+  color: string,
+  amount: number = 0.2
+): string => {
+  let [r, g, b] = hexToRgb(color);
+  const luminance = getLuminance(r, g, b);
+
+  if (luminance > 0.5) {
+    // Color is light, make it darker
+    r = Math.round(r * (1 - amount));
+    g = Math.round(g * (1 - amount));
+    b = Math.round(b * (1 - amount));
+  } else {
+    // Color is dark, make it lighter
+    r = Math.round(r + (255 - r) * amount);
+    g = Math.round(g + (255 - g) * amount);
+    b = Math.round(b + (255 - b) * amount);
+  }
+
+  // Clamp values to [0,255]
+  r = Math.max(0, Math.min(255, r));
+  g = Math.max(0, Math.min(255, g));
+  b = Math.max(0, Math.min(255, b));
+
+  return rgbToHex(r, g, b);
 };

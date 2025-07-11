@@ -62,7 +62,6 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
   useEffect(() => {
     const config_data: IExtensionConfig = extension_sdk.getContextData();
     setConfigData(config_data ?? {});
-    updateDashboardTheme(config_data);
   }, [extension_sdk]);
 
   // Computed property that provides defaulted boolean values
