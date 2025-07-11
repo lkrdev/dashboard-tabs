@@ -7,10 +7,12 @@ import { useAppContext } from "../AppContext";
 import Skeleton from "../components/Skeleton";
 import useConfigContext from "../ConfigContext";
 import useSdk from "../hooks/useSdk";
+import { adjustColorLightness } from "../utils/colorUtils";
 
 const StyledListItem = styled(ListItem)<{ paperColor?: string }>`
   & > a {
-    background-color: ${({ paperColor }) => paperColor};
+    background-color: ${({ paperColor, selected }) =>
+      selected ? adjustColorLightness(paperColor, 0.1) : paperColor};
   }
   position: relative;
   & .remove-button {
