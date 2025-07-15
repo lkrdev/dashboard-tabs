@@ -38,7 +38,7 @@ application: dashboard_tabs {
 
 Now go to settings and open a board, a folder, switch to adhoc dashboards or add default dashboards. For global filters to work, make sure the filters on each dashboard have the same name. For example if they have a "Date" filter, then navigating between the dashboards will pass the "Date" filter value to each dashboard.
 
-You can use this extnension multiple times with different configuration options by adding multiple applications to your manifest.lkml file.
+You can use this extension multiple times with different configuration options by adding multiple applications to your manifest.lkml file.
 
 ## Key Features
 
