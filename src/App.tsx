@@ -15,11 +15,9 @@ const App: React.FC = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    if (isLoading) {
-      timeoutRef.current = setTimeout(() => {
-        initial_wait.setFalse();
-      }, 1000);
-    }
+    timeoutRef.current = setTimeout(() => {
+      initial_wait.setFalse();
+    }, 1000);
     return () => {
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);

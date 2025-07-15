@@ -1,5 +1,5 @@
 import { Box, Card, Header, List, Span } from "@looker/components";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import Balancer from "react-wrap-balancer";
 import useSWR from "swr";
 import { useAppContext } from "../AppContext";
@@ -16,6 +16,7 @@ const Sidebar: React.FC = () => {
   const dashboard_ids: string[] = config_data.dashboards || [];
   const { folder_id, board_id, adhoc_dashboard_ids } = useAppContext();
   const sdk = useSdk();
+  const extensionSdk = useExtensionSdk();
 
   const folder_dashboards = useSWR(
     folder_id?.length ? `folder-dashboards-${folder_id}` : null,
@@ -53,7 +54,9 @@ const Sidebar: React.FC = () => {
     }
   }, [folder?.data?.name, board?.data?.title, config_data.label]);
 
-  useExtensionSdk().updateTitle(`${header_title} - Dashboard Tabs`);
+  useEffect(() => {
+    extensionSdk.updateTitle(`${header_title} - Dashboard Tabs`);
+  }, [header_title, extensionSdk]);
 
   return (
     <Card raised position="relative" p="xsmall" borderRadius="large">
