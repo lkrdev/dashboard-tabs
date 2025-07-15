@@ -124,7 +124,7 @@ const Settings: React.FC = () => {
               />
             </Space>
             <Space>
-              <Label>Dashboard IDs for the tabs</Label>
+              <Label>Default Dashboard IDs</Label>
               <InputChips
                 placeholder="Dashboard IDs"
                 name="dashboards"
@@ -279,33 +279,17 @@ const Settings: React.FC = () => {
             <Divider />
             <Space>
               <Checkbox
-                name="restrict_settings"
-                checked={values.restrict_settings}
+                name="remove_branded_loading"
+                checked={values.remove_branded_loading}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  formik.setFieldValue("restrict_settings", e.target.checked);
+                  formik.setFieldValue(
+                    "remove_branded_loading",
+                    e.target.checked
+                  );
                 }}
               />
-              <Label>Restrict Settings</Label>
+              <Label>Remove Branded Loading</Label>
             </Space>
-            {Boolean(values.restrict_settings) && (
-              <Space>
-                <Label>Group IDs</Label>
-                <InputChips
-                  placeholder="Group IDs allowed to update settings (in addition to Looker
-                    admins)"
-                  name="setting_group_ids"
-                  values={values.setting_group_ids || []}
-                  onChange={(values: string[]) =>
-                    formik.setFieldValue("setting_group_ids", values)
-                  }
-                />
-              </Space>
-            )}
-            {formik.errors.setting_group_ids && (
-              <Span color="critical" type="error" fontSize="xsmall">
-                {formik.errors.setting_group_ids}
-              </Span>
-            )}
             <Divider />
             <Space width="250px" between>
               <Label>Background Color</Label>
@@ -324,37 +308,67 @@ const Settings: React.FC = () => {
                 }}
               />
             </Space>
-            <Space width="250px" between>
-              <Label>Paper Color</Label>
-              <input
-                type="color"
-                value={values.paper_color || "#ffffff"}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  formik.setFieldValue("paper_color", e.target.value)
-                }
-                style={{
-                  width: "50px",
-                  height: "30px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  cursor: "pointer",
-                }}
-              />
-            </Space>
+            <SpaceVertical gap="none">
+              <Space width="250px" between>
+                <Label>Paper Color</Label>
+                <input
+                  type="color"
+                  value={values.paper_color || "#ffffff"}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    formik.setFieldValue("paper_color", e.target.value)
+                  }
+                  style={{
+                    width: "50px",
+                    height: "30px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                />
+              </Space>
+              <Span
+                textAlign="right"
+                color="text"
+                fontSize="xxsmall"
+                mt="xsmall"
+              >
+                *Requires Looker Theme feature enabled to affect dashboard
+                colors
+              </Span>
+            </SpaceVertical>
+
             <Divider />
             <Space>
               <Checkbox
-                name="remove_branded_loading"
-                checked={values.remove_branded_loading}
+                name="restrict_settings"
+                checked={values.restrict_settings}
                 onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  formik.setFieldValue(
-                    "remove_branded_loading",
-                    e.target.checked
-                  );
+                  formik.setFieldValue("restrict_settings", e.target.checked);
                 }}
               />
-              <Label>Remove Branded Loading</Label>
+              <Label>Restrict Settings</Label>
             </Space>
+            <SpaceVertical gap="none">
+              {Boolean(values.restrict_settings) && (
+                <Space>
+                  <Label>Group IDs</Label>
+                  <InputChips
+                    placeholder="Group IDs allowed to update settings (in addition to Looker
+                    admins)"
+                    name="setting_group_ids"
+                    values={values.setting_group_ids || []}
+                    onChange={(values: string[]) =>
+                      formik.setFieldValue("setting_group_ids", values)
+                    }
+                  />
+                </Space>
+              )}
+              {formik.errors.setting_group_ids && (
+                <Span color="critical" type="error" fontSize="xsmall">
+                  {formik.errors.setting_group_ids}
+                </Span>
+              )}
+            </SpaceVertical>
           </SpaceVertical>
         </DialogContent>
       </Dialog>

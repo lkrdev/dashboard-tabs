@@ -1,14 +1,14 @@
 # Dashboard Tabs - Looker Extension
 
-A Looker extension that creates tabbed dashboards with advanced navigation, global filters, printing, theming, and adhoc dashboard management. It transforms Looker into a tabbed interface, enabling seamless switching between dashboards while preserving filters and context. Supports folder, board, and adhoc dashboard navigation, plus printing functionality.
+Transform your Looker experience with a powerful tabbed dashboard interface. This extension enables seamless switching between multiple dashboards while preserving filters, context, and navigation state. Perfect for users who need to work across multiple dashboards simultaneously. Supports folder, board, and adhoc dashboard navigation, plus printing functionality, but is configurable to turn off any of these features. It also supports *global filters*. As long as your dashboard filters share the same name, they will be applied to all dashboards in the tabbed interface.
 
 ![Dashboard Tabs](assets/extension.png)
 
-## Use it now
+## 🚀 Quick Start
 
-Add this to any of your projects' `manifest.lkml` files, refresh the page, then go to Applications > Dashboard Tabs.
+Add this configuration to any of your projects' `manifest.lkml` files, refresh the page, then navigate to **Applications > Dashboard Tabs**.
 
-```
+```lookml
 application: dashboard_tabs {
   label: "Dashboard Tabs"
   url: "https://cdn.lkr.dev/apps/dashboard-tabs/latest/bundle.js"
@@ -35,123 +35,123 @@ application: dashboard_tabs {
 }
 ```
 
-## Features
+## ✨ Key Features
 
-### 🎯 Core Functionality
+### 🎯 Core Dashboard Management
+- **Tabbed Interface**: Switch between multiple dashboards in a single, unified interface
+- **Global Filters**: Apply filters that persist across all dashboard switches
+- **Context Preservation**: Maintain navigation state and filters when switching tabs
+- **Flexible Configuration**: Use predefined dashboard lists, folders, or boards as your tab sources
 
-- **Tabbed Dashboard Interface**: Switch between multiple dashboards in a single interface
-- **Global Filters**: Apply filters that persist across all dashboards
-- **Print All Dashboards**: Generate PDF exports of all configured dashboards
-- **Default and Custom Dashboard Tabs**: Configure a list of dashboard IDs to display as tabs, or use folders or boards as the tabs
+### 🗂️ Multiple Navigation Modes
 
-### 🎨 Theming & Customization
-
-- **Custom Background Colors**: Set custom background colors for the extension interface
-- **Custom Paper Colors**: Configure paper/tile colors for dashboard elements
-- **Automatic Text Contrast**: Automatically adjusts text colors for optimal readability
-- **Theme Consistency**: Applied across the entire extension interface and embedded dashboards
-- **Remove Branded Loading**: Option to hide the branded loading screen
-
-### 🗂️ Navigation Options
-
-#### Default Dashboard Tabs
-
-- Configure a list of dashboard IDs to display as tabs
-- Customizable extension label
+#### **Default Dashboard Tabs**
+- Configure specific dashboard IDs to display as tabs
+- Customizable extension label and branding
 - Automatic dashboard loading and switching
 
-#### Folder Navigation
-
+#### **Folder Navigation**
 - Browse and navigate through Looker folders
-- Access personal and shared folders
+- Access both personal and shared folders
 - Search functionality for finding specific folders
 - Hierarchical folder tree display
 
-#### Board Navigation
-
-- Navigate through Looker boards
-- Access favorite boards
+#### **Board Navigation**
+- Navigate through Looker boards and favorites
 - Search and browse all available boards
 - Display board sections and dashboard items
 
-#### Adhoc Dashboard Management
-
-- **Dynamic Dashboard Selection**: Add and remove dashboards on-the-fly without configuration changes
-- **Search and Add**: Search for dashboards and add them to the current session
-- **Remove Dashboards**: Easily remove dashboards from the current adhoc session
+#### **Adhoc Dashboard Management**
+- **Dynamic Selection**: Add and remove dashboards on-the-fly without configuration changes
+- **Search & Add**: Search for dashboards and add them to your current session
+- **Session Management**: Easily remove dashboards from your current adhoc session
 - **Save as Board**: Convert adhoc dashboard collections into permanent Looker boards
-- **Switch Between Modes**: Seamlessly switch between configured dashboards and adhoc mode
+- **Mode Switching**: Seamlessly switch between configured dashboards and adhoc mode
 
-### 🖨️ Printing Capabilities
+### 🎨 Theming & Customization
+- **Custom Background Colors**: Set personalized background colors for the extension interface
+- **Custom Paper Colors**: Configure colors for dashboard tiles and paper elements
+- **Automatic Text Contrast**: Smart text color adjustment for optimal readability
+- **Theme Consistency**: Applied across the entire extension interface and embedded dashboards
+- **Branded Loading Control**: Option to hide the branded loading screen
 
-- **Print All Dashboards**: Generate PDF exports of all configured dashboards
+### 🖨️ Advanced Printing
+- **Print All Dashboards**: Generate PDF exports of all configured dashboards in one operation
 - **Filter Preservation**: Maintains current filters when printing
+- **Batch Processing**: Print multiple dashboards simultaneously
 
-## ⚙️ Settings & Configuration
+## ⚙️ Configuration & Settings
 
-The extension provides comprehensive settings management through the Settings dialog:
+The extension provides comprehensive settings management through an intuitive Settings dialog:
 
-### Basic Configuration
+### **Basic Configuration**
+- **Extension Label**: Customize the header text and branding
+- **Dashboard IDs**: Configure which dashboards appear as default tabs
+- **Dashboard Search**: Search and add dashboards to your configuration
 
-- **Default Extension Label**: Customize the header text
-- **Dashboard IDs**: Configure which dashboards appear as tabs
-- **Dashboard Search**: Search and add dashboards to the configuration
-
-### Theming Settings
-
+### **Theming Options**
 - **Background Color**: Set the main background color for the extension interface
-- **Paper Color**: Configure the color for dashboard tiles and paper elements
-- **Remove Branded Loading**: Toggle the branded loading screen on/off
+- **Paper Color**: Configure colors for dashboard tiles and paper elements
+- **Loading Screen**: Toggle the branded loading screen on/off
 
-### Feature Toggles
+### **Feature Controls**
+- **Print Functionality**: Enable/disable the print all dashboards feature
+- **Folder Navigation**: Show/hide the folder navigation button
+- **Board Navigation**: Show/hide the board navigation button
+- **Adhoc Dashboards**: Enable dynamic dashboard selection and management
+- **Board Creation**: Allow converting adhoc collections to permanent boards
 
-- **Print All Dashboards**: Enable/turn off the print functionality
-- **Enable Folder Navigation**: Show/hide folder navigation button
-- **Enable Board Navigation**: Show/hide board navigation button
-- **Allow Adhoc Dashboards**: Enable dynamic dashboard selection and management
-- **Save Board from Adhoc Dashboards**: Allow converting adhoc collections to permanent boards
+### **Security & Permissions**
+- **Settings Access Control**: Limit who can modify extension settings
+- **Group-based Permissions**: Specify which user groups can update settings
+- **Admin Override**: Administrators always maintain access to settings
 
-### Security & Permissions
+## 📋 Usage Guide
 
-- **Restrict Settings**: Limit who can modify extension settings
-- **Group IDs**: Specify which user groups can update settings
-- **Admin Override**: Administrators always have access to settings
+### **Getting Started**
+1. **Access the Extension**: Navigate to the extension in Looker's navigation sidebar under **Applications**
+2. **Configure Dashboards**: Use Settings to add dashboard IDs as default dashboards (if not using board or folder navigation)
+3. **Navigate Between Modes**: Use the sidebar buttons to switch between different tab layouts (folder, board, or adhoc)
+4. **Apply Global Filters**: Filters persist across dashboard switches - ensure dashboards have matching filter names
+5. **Print Dashboards**: Enable print functionality to generate PDF exports of all dashboards
 
-## Versions and pinning a release
+### **Customizing Your Theme**
+1. **Access Settings**: Click the Settings button in the sidebar (requires appropriate permissions)
+2. **Configure Colors**: Use the color pickers to set background and paper colors
+3. **Preview Changes**: Changes are applied immediately for real-time preview
+4. **Save Configuration**: Click "Save" to persist your theme settings
 
-See [releases](https://github.com/lkrdev/dashboard-tabs/releases) for the latest versions. The CDN is updated automatically when a new version is released and you can pin your extension to a specific version with `url: "https://cdn.lkr.dev/apps/dashboard-tabs/<release>/bundle.js"`.
+### **Managing Adhoc Dashboards**
+1. **Enable Adhoc Mode**: Ensure "Allow Adhoc Dashboards" is enabled in Settings
+2. **Switch to Adhoc**: Click "Switch to Adhoc Dashboards" to enter dynamic mode
+3. **Add Dashboards**: Click "Add Dashboard" to search and add dashboards to your session
+4. **Remove Dashboards**: Hover over dashboard items and click the remove button (X) to remove them
+5. **Save as Board**: If enabled, click "Save as Board" to create a permanent board from your current collection
 
-## Development
+## 🔧 Development
 
-### Prerequisites
-
+### **Prerequisites**
 - Node.js (v18 or higher)
 - npm package manager
 - Looker instance with extension framework enabled
 
-### Build Process
+### **Build Commands**
 
-1. **Install Dependencies**:
-   ```bash
-   npm install
-   ```
-2. **Development Mode**:
-   ```bash
+```bash
+# Install dependencies
+npm install
 
-   # HTTPS development server (recommended for Looker)
-   npm run dev:https
+# Development servers
+npm run dev:https    # HTTPS (recommended for Looker)
+npm run dev          # HTTP (for development with tunnels like cloudflared)
 
-   # HTTP development server (recommended for development with a tunnel like cloudflared)
-   npm run dev
-   ```
-3. **Production Build**:
-   ```bash
-   npm run build
-   ```
+# Production build
+npm run build
+```
 
-### Manifest Configuration
+### **Local Development Configuration**
 
-The extension is configured through an application in your project's `manifest.lkml`:
+For local development, use this manifest configuration:
 
 ```lookml
 application: dashboard_tabs {
@@ -183,40 +183,25 @@ application: dashboard_tabs {
 }
 ```
 
-If developing locally, you can use `url: "https://localhost:8080/bundle.js"`. If you are modifying the extension and don't have access to a CDN, you can run `npm run build` to generate a bundle.js file in the `dist` directory. Drag this file to your Looker project while in dev mode and then use `file: "bundle.js"` in the manifest instead of `url`.
+**Note**: For local development without CDN access, run `npm run build` to generate a `bundle.js` file in the `dist` directory. Drag this file to your Looker project in dev mode and use `file: "bundle.js"` in the manifest instead of `url`.
 
-### Required API Permissions
+### **Required API Permissions**
 
-The extension requires the following Looker API methods:
+The extension requires these Looker API methods:
 
-- **User Management**: `me` - Get current user information
-- **Dashboard Operations**: `dashboard`, `search_dashboards` - Access dashboard data
-- **Folder Operations**: `folder`, `search_folders`, `folder_dashboards` - Navigate folders
-- **Board Operations**: `board`, `search_boards` - Access board data
-- **Board Creation**: `create_board`, `create_board_section`, `create_board_item` - Create boards from adhoc collections
+| Category | Methods | Purpose |
+|----------|---------|---------|
+| **User Management** | `me` | Get current user information |
+| **Dashboard Operations** | `dashboard`, `search_dashboards` | Access dashboard data |
+| **Folder Operations** | `folder`, `search_folders`, `folder_dashboards` | Navigate folders |
+| **Board Operations** | `board`, `search_boards` | Access board data |
+| **Board Creation** | `create_board`, `create_board_section`, `create_board_item`, `create_content_favorite` | Create boards from adhoc collections |
 
-## Usage
+## 📦 Version Management
 
-### Basic Usage
+See [releases](https://github.com/lkrdev/dashboard-tabs/releases) for the latest versions. The CDN updates automatically with new releases. To pin to a specific version, use:
 
-1. **Access the Extension**: Navigate to the extension in Looker's navigation sidebar under Applications.
-2. **Configure Dashboards**: Use Settings to add dashboard IDs as the default dashboards if a board or folder is not selected.
-3. **Navigate**: If you turn on folder or board navigation, use the sidebar buttons to switch between tab layouts.
-4. **Apply Filters**: Global filters will persist across dashboard switches. Make sure the dashboard has the same filter names to apply them across dashboards.
-5. **Print**: If you turn on print functionality, you can print all dashboards at once but turning on the print functionality.
-
-### Theming
-
-1. **Access Settings**: Click the Settings button in the sidebar (if you have permissions).
-2. **Configure Colors**: Use the color pickers to set background and paper colors.
-3. **Preview Changes**: Changes are applied immediately to see the effect.
-4. **Save Settings**: Click "Save" to persist your theme configuration.
-
-### Adhoc Dashboard Management
-
-1. **Enable Adhoc Mode**: Ensure "Allow Adhoc Dashboards" is enabled in Settings.
-2. **Switch to Adhoc**: Click "Switch to Adhoc Dashboards" to enter adhoc mode.
-3. **Add Dashboards**: Click "Add Dashboard" to search and add dashboards to your session.
-4. **Remove Dashboards**: Hover over dashboard items and click the remove button (X) to remove them.
-5. **Save as Board**: If "Save Board from Adhoc Dashboards" is enabled, click "Save as Board" to create a permanent board from your current collection.
+```lookml
+url: "https://cdn.lkr.dev/apps/dashboard-tabs/<release>/bundle.js"
+```
 

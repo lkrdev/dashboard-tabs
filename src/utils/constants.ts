@@ -27,4 +27,4 @@ export const createDashboardTheme = (config: {
 });
 
 export const DEFAULT_DASHBOARD_BACKGROUND_COLOR = "#A3B3C9";
-export const DEFAULT_DASHBOARD_PAPER_COLOR = "#ffffff";
+export const DEFAULT_DASHBOARD_PAPER_COLOR = "#f6f8fa";

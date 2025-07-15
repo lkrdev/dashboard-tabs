@@ -47,10 +47,11 @@ const AdhocDashboard: React.FC = () => {
       ]);
       if (board_section.ok) {
         const board_items_promises = (adhoc_dashboard_ids || []).map(
-          (dashboard_id) => {
+          (dashboard_id, index) => {
             return sdk.create_board_item({
               dashboard_id: dashboard_id,
               board_section_id: board_section.value.id,
+              order: index,
             });
           }
         );
@@ -113,7 +114,12 @@ const AdhocDashboard: React.FC = () => {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     if (inputRef.current?.value) {
-                      handleSave(inputRef.current.value);
+                      try {
+                        handleSave(inputRef.current.value);
+                      } catch (error: any) {
+                        setError(error.message);
+                        saving.setFalse();
+                      }
                     }
                   }
                 }}
