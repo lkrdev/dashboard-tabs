@@ -85,12 +85,17 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
   }, [me]);
 
   const getSearchParams = (global_filters?: boolean) => {
+    const {
+      dashboard_id,
+      sandboxed_host,
+      sdk,
+      _theme,
+      ...global_filters_params
+    } = current_search_ref.current;
     if (global_filters) {
-      const { dashboard_id, sandboxed_host, sdk, _theme, ...global_filters } =
-        current_search_ref.current;
-      return global_filters;
+      return global_filters_params;
     } else {
-      return current_search_ref.current;
+      return { dashboard_id, ...global_filters_params };
     }
   };
 
@@ -123,18 +128,15 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     } else {
       if (id) {
-        dashboard?.loadDashboard(
-          id +
-            "?" +
-            Object.entries(
-              Object.assign(
-                current_search_ref.current,
-                createDashboardTheme(dashboard_theme)
-              )
-            )
-              .map(([key, value]) => `${key}=${value}`)
-              .join("&")
-        );
+        const params = Object.entries(
+          Object.assign(
+            current_search_ref.current,
+            createDashboardTheme(dashboard_theme)
+          )
+        )
+          .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
+          .join("&");
+        dashboard?.loadDashboard(id + "?" + params);
       } else {
         dashboard?.preload();
       }

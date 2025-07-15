@@ -60,10 +60,12 @@ const SectionItem = ({ title, description }: IBoardList) => {
         as="li"
         style={{ userSelect: "none" }}
       >
-        <Span fontSize="small" fontWeight={"bold"}>
+        <Span fontSize="small" fontWeight={"bold"} color="text">
           {title}
         </Span>
-        <Span fontSize="xsmall">{description}</Span>
+        <Span fontSize="xsmall" color="text">
+          {description}
+        </Span>
       </SpaceVertical>
     </>
   );

@@ -1,34 +1,18 @@
-import { Box, Card, Header, List, ListItem, Span } from "@looker/components";
+import { Box, Card, Header, List, Span } from "@looker/components";
 import React, { useMemo } from "react";
 import Balancer from "react-wrap-balancer";
-import styled from "styled-components";
 import useSWR from "swr";
 import { useAppContext } from "../AppContext";
 import useConfigContext from "../ConfigContext";
+import useExtensionSdk from "../hooks/useExtensionSdk";
 import useSdk from "../hooks/useSdk";
 import AdhocDashboard from "./AdhocDashboard";
 import BoardList from "./BoardList";
 import ConfiguredButtons from "./ConfiguredButtons";
 import DashboardItem from "./DashboardItem";
 
-const StyledListItem = styled(ListItem)`
-  position: relative;
-  & .remove-button {
-    display: none;
-  }
-  &:hover .remove-button {
-    display: flex;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    align-items: center;
-    justify-content: center;
-  }
-`;
-
 const Sidebar: React.FC = () => {
-  const { config: config_data, can_update_settings } = useConfigContext();
+  const { config: config_data } = useConfigContext();
   const dashboard_ids: string[] = config_data.dashboards || [];
   const { folder_id, board_id, adhoc_dashboard_ids } = useAppContext();
   const sdk = useSdk();
@@ -69,6 +53,8 @@ const Sidebar: React.FC = () => {
     }
   }, [folder?.data?.name, board?.data?.title, config_data.label]);
 
+  useExtensionSdk().updateTitle(`${header_title} - Dashboard Tabs`);
+
   return (
     <Card raised position="relative" p="xsmall" borderRadius="large">
       <Header style={{ justifyContent: "space-between" }}>
@@ -80,8 +66,8 @@ const Sidebar: React.FC = () => {
       {type !== "board" && (
         <>
           {show_dashboards!.length === 0 ? (
-            <Span p="xsmall" fontSize="xsmall">
-              No default dashboards found
+            <Span p="xsmall" fontSize="xsmall" color="text">
+              No {type === "adhoc" ? "" : "default"} dashboards found
             </Span>
           ) : (
             <List>
