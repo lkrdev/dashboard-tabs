@@ -85,7 +85,7 @@ export const PrintAll = () => {
         filename + ".pdf",
         getSearchParams(true)
       );
-      const test = extension_sdk.openBrowserWindow(url, "_blank");
+      extension_sdk.openBrowserWindow(url, "_blank");
     }
     done.setTrue();
     doneTimeoutRef.current = setTimeout(() => {
@@ -104,7 +104,12 @@ export const PrintAll = () => {
 
   return (
     <Box flexGrow={1} width="100%">
-      <Button fullWidth onClick={handlePrintAll} color="neutral">
+      <Button
+        fullWidth
+        onClick={handlePrintAll}
+        disabled={running.value || done.value}
+        color="neutral"
+      >
         Print All Dashboards
       </Button>
       <ProgressIndicator show={running.value} width="100%" />
