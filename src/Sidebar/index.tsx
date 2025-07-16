@@ -73,7 +73,7 @@ const Sidebar: React.FC = () => {
               No {type === "adhoc" ? "" : "default"} dashboards found
             </Span>
           ) : (
-            <List>
+            <List style={{ overflow: "auto" }}>
               {show_dashboards!.map((dashboard_id: string) => {
                 return (
                   <DashboardItem

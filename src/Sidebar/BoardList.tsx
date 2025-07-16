@@ -86,7 +86,7 @@ const BoardList: React.FC = () => {
   }, [board.data]);
 
   return (
-    <List>
+    <List style={{ overflow: "auto" }}>
       {list.map((item) => {
         if (item.type === "dashboard") {
           return <DashboardItem key={`dashboard-${item.id}`} {...item} />;
