@@ -85,7 +85,7 @@ export const PrintAll = () => {
         filename + ".pdf",
         getSearchParams(true)
       );
-      const test = extension_sdk.openBrowserWindow(url, "_blank");
+      extension_sdk.openBrowserWindow(url, "_blank");
     }
     done.setTrue();
     doneTimeoutRef.current = setTimeout(() => {
