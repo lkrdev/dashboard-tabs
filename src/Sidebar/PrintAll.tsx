@@ -1,6 +1,6 @@
-import { Box, Button } from "@looker/components";
+import { Box, Button, Span } from "@looker/components";
 import { IDashboard } from "@looker/sdk";
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import useSWR, { State, useSWRConfig } from "swr";
 import { useBoolean } from "usehooks-ts";
 import { useAppContext } from "../AppContext";
@@ -35,7 +35,9 @@ export const PrintAll = () => {
   const extension_sdk = useExtensionSdk();
 
   const running = useBoolean(false);
-  const { folder_id, board_id } = useAppContext();
+  const done = useBoolean(false);
+  const doneTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const { folder_id, board_id, adhoc_dashboard_ids } = useAppContext();
   const { config: config_data } = useConfigContext();
   const { getSearchParams } = useAppContext();
   const sdk = useSdk();
@@ -62,6 +64,8 @@ export const PrintAll = () => {
           .filter((item) => item.type === "dashboard")
           .map((item) => item.id);
       }
+    } else if (adhoc_dashboard_ids?.length) {
+      dashboard_ids = adhoc_dashboard_ids;
     }
 
     if (dashboard_ids.length === 0) {
@@ -81,10 +85,22 @@ export const PrintAll = () => {
         filename + ".pdf",
         getSearchParams(true)
       );
-      extension_sdk.openBrowserWindow(url, "_blank");
+      const test = extension_sdk.openBrowserWindow(url, "_blank");
     }
+    done.setTrue();
+    doneTimeoutRef.current = setTimeout(() => {
+      done.setFalse();
+    }, 10000);
     running.setFalse();
   };
+
+  useEffect(() => {
+    return () => {
+      if (doneTimeoutRef.current) {
+        clearTimeout(doneTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <Box flexGrow={1} width="100%">
@@ -92,6 +108,12 @@ export const PrintAll = () => {
         Print All Dashboards
       </Button>
       <ProgressIndicator show={running.value} width="100%" />
+      {done.value && (
+        <Span fontSize={"xxsmall"}>
+          Please make sure your browser did not block the print tabs from
+          opening
+        </Span>
+      )}
     </Box>
   );
 };
