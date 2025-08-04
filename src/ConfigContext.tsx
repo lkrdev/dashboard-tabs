@@ -101,6 +101,7 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
     me,
     config_data.restrict_settings,
     config_data.setting_group_ids,
+    checkCurrentUserCanUpdateSettings,
   ]);
 
   const updateValues = (values: Partial<IExtensionConfig>) => {
