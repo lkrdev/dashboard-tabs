@@ -1,10 +1,11 @@
 import { Card } from "@looker/components";
 import { getEmbedSDK, ILookerConnection } from "@looker/embed-sdk";
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useBoolean } from "usehooks-ts";
 import { useAppContext } from "./AppContext";
+import VizSwapper from "./components/VizSwapper";
 import useConfigContext from "./ConfigContext";
 import useExtensionSdk from "./hooks/useExtensionSdk";
 import useSdk from "./hooks/useSdk";
@@ -44,6 +45,13 @@ const Dashboard: React.FC = () => {
   const iframe_visible = useBoolean(false);
 
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // const showVizSwapper = useMemo(() => {
+  //   if (config.viz_swapping_dashboards && selected_dashboard_id) {
+  //     return config.viz_swapping_dashboards.includes(selected_dashboard_id);
+  //   }
+  //   return false;
+  // }, [config.viz_swapping_dashboards, selected_dashboard_id]);
 
   useEffect(() => {
     // if there are errors and we dont see dashboard:loaded event, show iframe anyway
@@ -102,14 +110,20 @@ function updateDashboardLayout(data, layoutType) {
 }
 
   useEffect(() => {
-    console.log(`changing layout to: ${config.layout}`)
-    if(!dashboard || !config || dashboardLayout?.layouts === undefined) return;
+    if(!dashboard || !config || !dashboardLayout?.layouts) return;
+
+    // if (!showVizSwapper) {
+    //   dashboard.asDashboardConnection().setOptions({
+    //     ...dashboardLayout
+    //   })
+    //   return;
+    // }
 
     dashboard.asDashboardConnection().setOptions({
       ...updateDashboardLayout(dashboardLayout, config.layout)
     })
 
-  },[config,dashboard,dashboardLayout])
+  },[config.layout, dashboard, dashboardLayout])
 
   const folder_dashboards = useSWR(
     folder_id?.length ? `folder-dashboards-${folder_id}` : null,
@@ -180,12 +194,16 @@ function updateDashboardLayout(data, layoutType) {
     ]
   );
   return (
+    <>
     <StyledCard
       raised
       borderRadius="large"
       ref={dashboardRef}
       iframe_visible={iframe_visible.value}
-    />
+      >
+    </StyledCard>
+    <VizSwapper />
+    </>
   );
 };
 

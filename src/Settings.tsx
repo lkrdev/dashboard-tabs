@@ -29,6 +29,11 @@ const Settings: React.FC = () => {
   const open = useBoolean(false);
   const [debounced_search, setDebouncedSearch] = useDebounceValue("", 500);
   const [search, setSearch] = useState("");
+  const [debouncedVizSwapSearch, setDebouncedVizSwapSearch] = useDebounceValue(
+    "",
+    500
+  );
+  const [vizSwapSearch, setVizSwapSearch] = useState("");
   const sdk = useSdk();
   const searched_dashboards = useSWR(
     `debounced_search=${debounced_search}`,
@@ -38,6 +43,19 @@ const Settings: React.FC = () => {
           limit: 50,
           title: debounced_search?.length
             ? `%${debounced_search.replace(/\s/g, "%")}%`
+            : undefined,
+          sorts: "title",
+        })
+      )
+  );
+  const searched_viz_swap_dashboards = useSWR(
+    `debounced_viz_swap_search=${debouncedVizSwapSearch}`,
+    () =>
+      sdk.ok(
+        sdk.search_dashboards({
+          limit: 50,
+          title: debouncedVizSwapSearch?.length
+            ? `%${debouncedVizSwapSearch.replace(/\s/g, "%")}%`
             : undefined,
           sorts: "title",
         })
@@ -67,7 +85,8 @@ const Settings: React.FC = () => {
         config_data.save_board_from_adhoc_dashboards || true,
       background_color: config_data.background_color,
       paper_color: config_data.paper_color,
-      layout: config_data.layout
+      layout: config_data.layout,
+      viz_swapping_dashboards: config_data.viz_swapping_dashboards || [],
     } as IExtensionConfig,
     validate: async (values) => {
       let errors: Partial<{ [key in keyof IExtensionConfig]: string }> = {};
@@ -94,6 +113,7 @@ const Settings: React.FC = () => {
   }, [config_data]);
 
   const isDebouncing = debounced_search !== search;
+  const vizSwapIsDebouncing = debouncedVizSwapSearch !== vizSwapSearch;
 
   return (
     <>
@@ -110,6 +130,8 @@ const Settings: React.FC = () => {
           }
           setSearch("");
           setDebouncedSearch("");
+          setVizSwapSearch("");
+          setDebouncedVizSwapSearch("");
         }}
       >
         <DialogHeader>Settings</DialogHeader>
@@ -297,7 +319,48 @@ const Settings: React.FC = () => {
                 value={values.layout}
               />
             </Space>
-            <Divider />
+            {/* <Space>
+              <Label>Dashboards Enabled for Dynamic Viz Swapping</Label>
+              <InputChips
+                placeholder="Dashboard IDs"
+                name="viz_swapping_dashboards"
+                values={values.viz_swapping_dashboards || []}
+                onChange={(values: string[]) =>
+                  formik.setFieldValue("viz_swapping_dashboards", values)
+                }
+              />
+            </Space> */}
+            {/* <Space>
+            <InputSearch
+              options={
+                isDebouncing
+                  ? []
+                  : searched_viz_swap_dashboards.data?.map((d) => ({
+                      value: d.id!,
+                      label: d.title!,
+                    }))
+              }
+              value={vizSwapSearch}
+              onChange={(value: string) => {
+                setDebouncedVizSwapSearch(value);
+                setVizSwapSearch(value);
+              }}
+              onSelectOption={(option) => {
+                if (option?.value) {
+                  formik.setFieldValue("viz_swapping_dashboards", [
+                    ...(values.viz_swapping_dashboards || []),
+                    option.value,
+                  ]);
+                }
+              }}
+              changeOnSelect={false}
+              placeholder="Search dashboards and click to add"
+            />
+            </Space>
+            <ProgressIndicator
+              show={searched_viz_swap_dashboards.isLoading || vizSwapIsDebouncing}
+            />
+            <Divider /> */}
             <Space>
               <Checkbox
                 name="remove_branded_loading"
