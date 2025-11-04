@@ -1,5 +1,5 @@
 import { Box } from "@looker/components";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import { useBoolean } from "usehooks-ts";
 import { useAppContext } from "./AppContext";
 import LkrLoading from "./components/LkrLoading";
@@ -8,11 +8,15 @@ import Dashboard from "./Dashboard";
 import Sidebar from "./Sidebar";
 import { getTextColor } from "./utils/colorUtils";
 import { DEFAULT_DASHBOARD_PAPER_COLOR } from "./utils/constants";
+import { useEditingPanel, EditingPanelProvider } from "./EditingPanelContext";
+import EditingPanel from "./components/EditingPanel";
+import useSdk from "./hooks/useSdk";
 
 const App: React.FC = () => {
-  const { isLoading, me } = useAppContext();
+  const { isLoading, me, selected_dashboard_id } = useAppContext();
   const initial_wait = useBoolean(true);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const extensionContext = useSdk();
 
   useEffect(() => {
     timeoutRef.current = setTimeout(() => {
@@ -51,22 +55,41 @@ const App: React.FC = () => {
     );
   } else if (me) {
     return (
-      <>
-        <Box
-          p="medium"
-          display="grid"
-          height="100%"
-          backgroundColor={background_color}
-          style={{ gridTemplateColumns: "300px 1fr", gap: "12px" }}
-        >
-          <Sidebar />
-          <Dashboard />
-        </Box>
-      </>
+      <EditingPanelProvider extensionContext={extensionContext} selected_dashboard_id={selected_dashboard_id} user_id={me.id}>
+        <AppContent />
+      </EditingPanelProvider>
     );
   } else {
     return <Box>Unknown error</Box>;
   }
 };
+
+const AppContent: React.FC = () => {
+  const { background_color } = useConfigContext().config;
+  const { setDashboardLayout } = useAppContext()
+  const { isEditing, editingLayout, closeEditingPanel, updateEditingLayout } = useEditingPanel();
+
+  return (
+    <>
+      <Box
+        p="medium"
+        display="grid"
+        height="100%"
+        backgroundColor={background_color}
+        style={{ gridTemplateColumns: "300px 1fr", gap: "12px" }}
+      >
+        <Sidebar />
+        <Dashboard />
+      </Box>
+      {isEditing && editingLayout !== undefined && editingLayout.layouts !== undefined && (
+        <EditingPanel
+          dashboardLayout={editingLayout}
+          onUpdateLayout={updateEditingLayout}
+          onClose={closeEditingPanel}
+        />
+      )}
+    </>
+  );
+}
 
 export default App;

@@ -29,11 +29,6 @@ const Settings: React.FC = () => {
   const open = useBoolean(false);
   const [debounced_search, setDebouncedSearch] = useDebounceValue("", 500);
   const [search, setSearch] = useState("");
-  const [debouncedVizSwapSearch, setDebouncedVizSwapSearch] = useDebounceValue(
-    "",
-    500
-  );
-  const [vizSwapSearch, setVizSwapSearch] = useState("");
   const sdk = useSdk();
   const searched_dashboards = useSWR(
     `debounced_search=${debounced_search}`,
@@ -48,19 +43,7 @@ const Settings: React.FC = () => {
         })
       )
   );
-  const searched_viz_swap_dashboards = useSWR(
-    `debounced_viz_swap_search=${debouncedVizSwapSearch}`,
-    () =>
-      sdk.ok(
-        sdk.search_dashboards({
-          limit: 50,
-          title: debouncedVizSwapSearch?.length
-            ? `%${debouncedVizSwapSearch.replace(/\s/g, "%")}%`
-            : undefined,
-          sorts: "title",
-        })
-      )
-  );
+  
   const { is_admin, updateLayout } = useAppContext();
   const {
     config: config_data,
@@ -86,7 +69,7 @@ const Settings: React.FC = () => {
       background_color: config_data.background_color,
       paper_color: config_data.paper_color,
       layout: config_data.layout,
-      viz_swapping_dashboards: config_data.viz_swapping_dashboards || [],
+      customize_dashboard_layout: config_data.customize_dashboard_layout || false,
     } as IExtensionConfig,
     validate: async (values) => {
       let errors: Partial<{ [key in keyof IExtensionConfig]: string }> = {};
@@ -113,7 +96,6 @@ const Settings: React.FC = () => {
   }, [config_data]);
 
   const isDebouncing = debounced_search !== search;
-  const vizSwapIsDebouncing = debouncedVizSwapSearch !== vizSwapSearch;
 
   return (
     <>
@@ -130,8 +112,6 @@ const Settings: React.FC = () => {
           }
           setSearch("");
           setDebouncedSearch("");
-          setVizSwapSearch("");
-          setDebouncedVizSwapSearch("");
         }}
       >
         <DialogHeader>Settings</DialogHeader>
@@ -302,65 +282,18 @@ const Settings: React.FC = () => {
               )}
             <Divider />
             <Space>
-              <Label>Customize Dashboard Tile Layout</Label>
-              <Select 
-                placeholder="Select your desired dashboard layout"
-                options={[
-                  { label: 'Single Column', value: 'newspaper' },
-                  { label: '4 Column', value: 'grid' },
-                  { label: 'Unset', value: 'unset'}
-                ]}
-                onChange={(e: string) => {
+              <Checkbox
+                name="customize_tile_layout"
+                checked={values.customize_dashboard_layout}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   formik.setFieldValue(
-                    'layout',
-                    e
-                  )
+                    "customize_dashboard_layout",
+                    e.target.checked
+                  );
                 }}
-                value={values.layout}
               />
+              <Label>Customize Dashboard Tile Layout</Label>
             </Space>
-            {/* <Space>
-              <Label>Dashboards Enabled for Dynamic Viz Swapping</Label>
-              <InputChips
-                placeholder="Dashboard IDs"
-                name="viz_swapping_dashboards"
-                values={values.viz_swapping_dashboards || []}
-                onChange={(values: string[]) =>
-                  formik.setFieldValue("viz_swapping_dashboards", values)
-                }
-              />
-            </Space> */}
-            {/* <Space>
-            <InputSearch
-              options={
-                isDebouncing
-                  ? []
-                  : searched_viz_swap_dashboards.data?.map((d) => ({
-                      value: d.id!,
-                      label: d.title!,
-                    }))
-              }
-              value={vizSwapSearch}
-              onChange={(value: string) => {
-                setDebouncedVizSwapSearch(value);
-                setVizSwapSearch(value);
-              }}
-              onSelectOption={(option) => {
-                if (option?.value) {
-                  formik.setFieldValue("viz_swapping_dashboards", [
-                    ...(values.viz_swapping_dashboards || []),
-                    option.value,
-                  ]);
-                }
-              }}
-              changeOnSelect={false}
-              placeholder="Search dashboards and click to add"
-            />
-            </Space>
-            <ProgressIndicator
-              show={searched_viz_swap_dashboards.isLoading || vizSwapIsDebouncing}
-            />
-            <Divider /> */}
             <Space>
               <Checkbox
                 name="remove_branded_loading"
