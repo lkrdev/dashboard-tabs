@@ -14,7 +14,9 @@ application: dashboard_tabs {
       "create_board",
       "create_board_section",
       "create_board_item",
-      "create_content_favorite"
+      "create_content_favorite",
+      "artifact",
+      "update_artifacts"
     ]
     navigation: yes
     use_embeds: yes

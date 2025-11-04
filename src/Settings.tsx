@@ -43,6 +43,7 @@ const Settings: React.FC = () => {
         })
       )
   );
+  
   const { is_admin, updateLayout } = useAppContext();
   const {
     config: config_data,
@@ -67,7 +68,8 @@ const Settings: React.FC = () => {
         config_data.save_board_from_adhoc_dashboards || true,
       background_color: config_data.background_color,
       paper_color: config_data.paper_color,
-      layout: config_data.layout
+      layout: config_data.layout,
+      customize_dashboard_layout: config_data.customize_dashboard_layout || false,
     } as IExtensionConfig,
     validate: async (values) => {
       let errors: Partial<{ [key in keyof IExtensionConfig]: string }> = {};
@@ -280,24 +282,18 @@ const Settings: React.FC = () => {
               )}
             <Divider />
             <Space>
-              <Label>Customize Dashboard Tile Layout</Label>
-              <Select 
-                placeholder="Select your desired dashboard layout"
-                options={[
-                  { label: 'Single Column', value: 'newspaper' },
-                  { label: '4 Column', value: 'grid' },
-                  { label: 'Unset', value: 'unset'}
-                ]}
-                onChange={(e: string) => {
+              <Checkbox
+                name="customize_tile_layout"
+                checked={values.customize_dashboard_layout}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                   formik.setFieldValue(
-                    'layout',
-                    e
-                  )
+                    "customize_dashboard_layout",
+                    e.target.checked
+                  );
                 }}
-                value={values.layout}
               />
+              <Label>Customize Dashboard Tile Layout</Label>
             </Space>
-            <Divider />
             <Space>
               <Checkbox
                 name="remove_branded_loading"

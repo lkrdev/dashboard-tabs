@@ -27,6 +27,7 @@ const intersection = (arr1: string[], arr2: string[]): string[] => {
 
 export interface IExtensionConfig {
   dashboards?: string[];
+  customize_dashboard_layout?: boolean;
   setting_group_ids?: string[];
   restrict_settings?: boolean;
   label?: string;
@@ -79,7 +80,8 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
       background_color:
         config_data.background_color ?? DEFAULT_DASHBOARD_BACKGROUND_COLOR,
       paper_color: config_data.paper_color ?? DEFAULT_DASHBOARD_PAPER_COLOR,
-      layout: config_data.layout ?? undefined
+      layout: config_data.layout ?? undefined,
+      customize_dashboard_layout: config_data.customize_dashboard_layout ?? false,
     }),
     [config_data]
   );

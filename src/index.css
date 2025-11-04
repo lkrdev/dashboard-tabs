@@ -147,3 +147,50 @@ body, html, #extension-root {
     padding: 0;
     overflow: hidden;
 }
+
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.editing-toolbar {
+  display: flex;
+  gap: 1rem;
+  padding: 1rem;
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  width: 5rem;
+  height: 5rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.2);
+}
+
+.editing-toolbar button {
+  border: none;
+  padding: 0.5rem;
+  border-radius: 50%;
+  cursor: pointer;
+  width: 4rem;
+  height: 4rem;
+}
+
+.editing-toolbar button.active {
+  background-color: #ccc;
+}
+
+@import '~react-grid-layout/css/styles.css';
+@import '~react-resizable/css/styles.css';
