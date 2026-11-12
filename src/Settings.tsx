@@ -67,6 +67,7 @@ const Settings: React.FC = () => {
         config_data.save_board_from_adhoc_dashboards || true,
       background_color: config_data.background_color,
       paper_color: config_data.paper_color,
+      hide_dashboard_header: config_data.hide_dashboard_header || false,
       layout: config_data.layout
     } as IExtensionConfig,
     validate: async (values) => {
@@ -347,6 +348,28 @@ const Settings: React.FC = () => {
                   }}
                 />
               </Space>
+              <Space mt="small">
+                <Checkbox
+                  name="hide_dashboard_header"
+                  checked={values.hide_dashboard_header || false}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    formik.setFieldValue(
+                      "hide_dashboard_header",
+                      e.target.checked
+                    );
+                  }}
+                />
+                <Label
+                  onClick={() => {
+                    formik.setFieldValue(
+                      "hide_dashboard_header",
+                      !values.hide_dashboard_header
+                    );
+                  }}
+                >
+                  Hide Dashboard Headers
+                </Label>
+              </Space>
               <Span
                 textAlign="right"
                 color="text"
@@ -354,7 +377,7 @@ const Settings: React.FC = () => {
                 mt="xsmall"
               >
                 *Requires Looker Theme feature enabled to affect dashboard
-                colors
+                colors and headers
               </Span>
             </SpaceVertical>
 
