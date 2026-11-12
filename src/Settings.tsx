@@ -1,5 +1,6 @@
 import {
   ButtonOutline,
+  ButtonToggle,
   Checkbox,
   Dialog,
   DialogContent,
@@ -24,14 +25,35 @@ import { useToast } from "./components/Toast/ToastContext";
 import useConfigContext, { IExtensionConfig } from "./ConfigContext";
 import useSdk from "./hooks/useSdk";
 
+type DefaultSourceMode = "none" | "dashboards" | "board";
+
+const getDefaultMode = (cfg: IExtensionConfig): DefaultSourceMode =>
+  cfg.default_board_id
+    ? "board"
+    : cfg.dashboards?.length
+    ? "dashboards"
+    : "none";
+
 const Settings: React.FC = () => {
   const { showSuccess } = useToast();
   const open = useBoolean(false);
   const [debounced_search, setDebouncedSearch] = useDebounceValue("", 500);
   const [search, setSearch] = useState("");
   const sdk = useSdk();
+  const { is_admin, updateLayout } = useAppContext();
+  const {
+    config: config_data,
+    updateConfig,
+    can_update_settings,
+    checkCurrentUserCanUpdateSettings,
+  } = useConfigContext();
+  const [default_mode, setDefaultMode] = useState<DefaultSourceMode>(() =>
+    getDefaultMode(config_data)
+  );
   const searched_dashboards = useSWR(
-    `debounced_search=${debounced_search}`,
+    open.value && default_mode === "dashboards"
+      ? `debounced_search=${debounced_search}`
+      : null,
     () =>
       sdk.ok(
         sdk.search_dashboards({
@@ -43,28 +65,38 @@ const Settings: React.FC = () => {
         })
       )
   );
-  const { is_admin, updateLayout } = useAppContext();
-  const {
-    config: config_data,
-    updateConfig,
-    can_update_settings,
-    checkCurrentUserCanUpdateSettings,
-  } = useConfigContext();
+  const searched_boards = useSWR(
+    open.value && default_mode === "board"
+      ? `debounced_board_search=${debounced_search}`
+      : null,
+    () =>
+      sdk.ok(
+        sdk.search_boards({
+          limit: 50,
+          title: debounced_search?.length
+            ? `%${debounced_search.replace(/\s/g, "%")}%`
+            : undefined,
+          fields: "id,title",
+          sorts: "title asc",
+        })
+      )
+  );
 
   const { values, ...formik } = useFormik({
     validateOnChange: false,
     validateOnBlur: true,
     initialValues: {
       dashboards: config_data.dashboards || [],
+      default_board_id: config_data.default_board_id || "",
       restrict_settings: config_data.restrict_settings || false,
-      print_all_dashboards: config_data.print_all_dashboards || true,
+      print_all_dashboards: config_data.print_all_dashboards ?? true,
       setting_group_ids: config_data.setting_group_ids || [],
       label: config_data.label || "",
-      enable_folder_navigation: config_data.enable_folder_navigation || true,
-      enable_board_navigation: config_data.enable_board_navigation || true,
-      allow_adhoc_dashboards: config_data.allow_adhoc_dashboards || true,
+      enable_folder_navigation: config_data.enable_folder_navigation ?? true,
+      enable_board_navigation: config_data.enable_board_navigation ?? true,
+      allow_adhoc_dashboards: config_data.allow_adhoc_dashboards ?? true,
       save_board_from_adhoc_dashboards:
-        config_data.save_board_from_adhoc_dashboards || true,
+        config_data.save_board_from_adhoc_dashboards ?? true,
       background_color: config_data.background_color,
       paper_color: config_data.paper_color,
       hide_dashboard_header: config_data.hide_dashboard_header || false,
@@ -85,13 +117,22 @@ const Settings: React.FC = () => {
       }
       return errors;
     },
-    onSubmit: (values) => {
-      updateConfig({ ...values });
+    onSubmit: async (values) => {
+      await updateConfig({
+        ...values,
+        dashboards:
+          default_mode === "dashboards" ? values.dashboards : undefined,
+        default_board_id:
+          default_mode === "board"
+            ? values.default_board_id?.trim() || undefined
+            : undefined,
+      });
       showSuccess("Settings updated", 5000);
     },
   });
   useEffect(() => {
     formik.resetForm({ values: config_data });
+    setDefaultMode(getDefaultMode(config_data));
   }, [config_data]);
 
   const isDebouncing = debounced_search !== search;
@@ -127,44 +168,110 @@ const Settings: React.FC = () => {
               />
             </Space>
             <Space>
-              <Label>Default Dashboard IDs</Label>
-              <InputChips
-                placeholder="Dashboard IDs"
-                name="dashboards"
-                values={values.dashboards || []}
-                onChange={(values: string[]) =>
-                  formik.setFieldValue("dashboards", values)
-                }
+              <Label>Default Source</Label>
+              <ButtonToggle
+                value={default_mode}
+                onChange={(val: string) => {
+                  if (val) {
+                    setDefaultMode(val as DefaultSourceMode);
+                    setSearch("");
+                    setDebouncedSearch("");
+                  }
+                }}
+                options={[
+                  { value: "none", label: "None" },
+                  { value: "dashboards", label: "Dashboard IDs" },
+                  { value: "board", label: "Board ID" },
+                ]}
               />
             </Space>
-            <InputSearch
-              options={
-                isDebouncing
-                  ? []
-                  : searched_dashboards.data?.map((d) => ({
-                      value: d.id!,
-                      label: d.title!,
-                    }))
-              }
-              value={search}
-              onChange={(value: string) => {
-                setDebouncedSearch(value);
-                setSearch(value);
-              }}
-              onSelectOption={(option) => {
-                if (option?.value) {
-                  formik.setFieldValue("dashboards", [
-                    ...(values.dashboards || []),
-                    option.value,
-                  ]);
-                }
-              }}
-              changeOnSelect={false}
-              placeholder="Search dashboards and click to add"
-            />
-            <ProgressIndicator
-              show={searched_dashboards.isLoading || isDebouncing}
-            />
+            {default_mode === "dashboards" && (
+              <>
+                <Space>
+                  <Label>Default Dashboard IDs</Label>
+                  <InputChips
+                    placeholder="Dashboard IDs"
+                    name="dashboards"
+                    values={values.dashboards || []}
+                    onChange={(values: string[]) =>
+                      formik.setFieldValue("dashboards", values)
+                    }
+                  />
+                </Space>
+                <InputSearch
+                  options={
+                    isDebouncing
+                      ? []
+                      : searched_dashboards.data?.map((d) => ({
+                          value: d.id!,
+                          label: d.title!,
+                        }))
+                  }
+                  value={search}
+                  onChange={(value: string) => {
+                    setDebouncedSearch(value);
+                    setSearch(value);
+                  }}
+                  onSelectOption={(option) => {
+                    if (option?.value) {
+                      formik.setFieldValue("dashboards", [
+                        ...(values.dashboards || []),
+                        option.value,
+                      ]);
+                    }
+                  }}
+                  changeOnSelect={false}
+                  placeholder="Search dashboards and click to add"
+                />
+                <ProgressIndicator
+                  show={searched_dashboards.isLoading || isDebouncing}
+                />
+              </>
+            )}
+            {default_mode === "board" && (
+              <>
+                <Space>
+                  <Label>Default Board ID</Label>
+                  <InputText
+                    placeholder="Board ID (e.g. 21)"
+                    name="default_board_id"
+                    value={values.default_board_id || ""}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                      formik.setFieldValue(
+                        "default_board_id",
+                        e.target.value.match(/\/boards\/([^/?#]+)/)?.[1] ??
+                          e.target.value
+                      );
+                    }}
+                  />
+                </Space>
+                <InputSearch
+                  options={
+                    isDebouncing
+                      ? []
+                      : searched_boards.data?.map((b) => ({
+                          value: b.id!,
+                          label: b.title!,
+                        }))
+                  }
+                  value={search}
+                  onChange={(value: string) => {
+                    setDebouncedSearch(value);
+                    setSearch(value);
+                  }}
+                  onSelectOption={(option) => {
+                    if (option?.value) {
+                      formik.setFieldValue("default_board_id", option.value);
+                    }
+                  }}
+                  changeOnSelect={false}
+                  placeholder="Search boards and click to select"
+                />
+                <ProgressIndicator
+                  show={searched_boards.isLoading || isDebouncing}
+                />
+              </>
+            )}
             <Divider />
             <Space>
               <Checkbox
