@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import { useHistory, useLocation } from "react-router-dom";
 import { useAppContext } from "./AppContext";
 import useExtensionSdk from "./hooks/useExtensionSdk";
 import {
@@ -14,7 +15,7 @@ import {
 
 type TConfigContext = {
   config: IExtensionConfig;
-  updateConfig: (config: IExtensionConfig) => void;
+  updateConfig: (config: IExtensionConfig) => Promise<void>;
   can_update_settings: boolean;
   checkCurrentUserCanUpdateSettings: (group_ids: string[]) => boolean;
 };
@@ -27,6 +28,7 @@ const intersection = (arr1: string[], arr2: string[]): string[] => {
 
 export interface IExtensionConfig {
   dashboards?: string[];
+  default_board_id?: string;
   setting_group_ids?: string[];
   restrict_settings?: boolean;
   label?: string;
@@ -59,13 +61,42 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
 }) => {
   const extension_sdk = useExtensionSdk();
   const [config_data, setConfigData] = useState<IExtensionConfig>({});
-  const { is_admin, me, updateDashboardTheme } = useAppContext();
+  const {
+    is_admin,
+    me,
+    updateDashboardTheme,
+    folder_id,
+    board_id,
+    adhoc_dashboard_ids,
+  } = useAppContext();
+  const history = useHistory();
+  const location = useLocation();
 
   useEffect(() => {
     const config_data: IExtensionConfig = extension_sdk.getContextData();
     setConfigData(config_data ?? {});
     updateDashboardTheme(config_data ?? {});
   }, [extension_sdk]);
+
+  useEffect(() => {
+    if (
+      config_data.default_board_id &&
+      !folder_id &&
+      !board_id &&
+      adhoc_dashboard_ids === undefined
+    ) {
+      history.replace(
+        `/boards/${config_data.default_board_id}${location.search}`
+      );
+    }
+  }, [
+    config_data.default_board_id,
+    folder_id,
+    board_id,
+    adhoc_dashboard_ids,
+    history,
+    location.search,
+  ]);
 
   // Computed property that provides defaulted boolean values
   const config_data_with_defaults = useMemo(
@@ -108,12 +139,13 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
     config_data.setting_group_ids,
   ]);
 
-  const updateValues = (values: Partial<IExtensionConfig>) => {
+  const updateValues = async (values: Partial<IExtensionConfig>) => {
     if (!can_update_settings) {
       console.error("You are not allowed to update the settings");
       return;
     }
     let current: IExtensionConfig = extension_sdk.getContextData() || {};
+    const prev_default_board_id = current.default_board_id;
     for (const [key, value] of Object.entries(values)) {
       const casted_key = key as keyof IExtensionConfig;
       if (value === undefined || value === null || value === "") {
@@ -124,8 +156,17 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
     }
     setConfigData({ ...current });
     updateDashboardTheme(current);
-    extension_sdk.saveContextData(current);
+    await extension_sdk.saveContextData(current);
     extension_sdk.refreshContextData();
+    if (current.default_board_id !== prev_default_board_id) {
+      extension_sdk.updateLocation(
+        `/extensions/${extension_sdk.lookerHostData?.extensionId}${
+          current.default_board_id ? `/boards/${current.default_board_id}` : "/"
+        }`,
+        {},
+        "_self"
+      );
+    }
   };
   return (
     <ConfigContext.Provider
