@@ -3,6 +3,7 @@ import { getTextColor } from "./colorUtils";
 export const createDashboardTheme = (config: {
   background_color?: string;
   paper_color?: string;
+  hide_dashboard_header?: boolean;
 }) => ({
   _theme: JSON.stringify({
     background_color: config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR,
@@ -23,6 +24,7 @@ export const createDashboardTheme = (config: {
     title_color: getTextColor(
       config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR
     ),
+    ...(config.hide_dashboard_header ? { show_dashboard_header: false } : {}),
   }),
 });
 

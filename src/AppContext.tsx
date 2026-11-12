@@ -12,9 +12,7 @@ import {
 
 export type GlobalFilters = { [key: string]: string };
 
-type DashboardTheme = {
-  background_color?: string;
-};
+type DashboardTheme = Parameters<typeof createDashboardTheme>[0];
 
 interface AppContextType {
   isLoading: boolean;
@@ -132,12 +130,10 @@ export const AppContextProvider: React.FC<{ children: React.ReactNode }> = ({
       return;
     } else {
       if (id) {
-        const params = Object.entries(
-          Object.assign(
-            current_search_ref.current,
-            createDashboardTheme(dashboard_theme)
-          )
-        )
+        const params = Object.entries({
+          ...current_search_ref.current,
+          ...createDashboardTheme(dashboard_theme),
+        })
           .map(([key, value]) => `${key}=${encodeURIComponent(value)}`)
           .join("&");
         dashboard?.loadDashboard(id + "?" + params);
