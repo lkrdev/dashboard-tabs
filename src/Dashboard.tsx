@@ -102,14 +102,21 @@ function updateDashboardLayout(data, layoutType) {
 }
 
   useEffect(() => {
-    console.log(`changing layout to: ${config.layout}`)
-    if(!dashboard || !config || dashboardLayout?.layouts === undefined) return;
+    if (
+      !dashboard ||
+      !dashboardLayout?.layouts ||
+      (config.layout !== "newspaper" && config.layout !== "grid")
+    ) {
+      return;
+    }
 
     dashboard.asDashboardConnection().setOptions({
-      ...updateDashboardLayout(dashboardLayout, config.layout)
-    })
-
-  },[config,dashboard,dashboardLayout])
+      ...updateDashboardLayout(
+        JSON.parse(JSON.stringify(dashboardLayout)),
+        config.layout
+      ),
+    });
+  }, [config.layout, dashboard, dashboardLayout]);
 
   const folder_dashboards = useSWR(
     folder_id?.length ? `folder-dashboards-${folder_id}` : null,
