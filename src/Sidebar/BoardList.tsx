@@ -1,42 +1,16 @@
-import {
-  Divider,
-  List,
-  ListItem,
-  SpaceVertical,
-  Span,
-} from "@looker/components";
+import { Divider, List, SpaceVertical, Span } from "@looker/components";
 import React, { useMemo } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
 import { useAppContext } from "../AppContext";
-import Skeleton from "../components/Skeleton";
+import useConfigContext from "../ConfigContext";
 import useSdk from "../hooks/useSdk";
-import { getBoardList, IBoardList } from "../utils/getBoardList";
-
-const DashboardItem = ({ id }: IBoardList) => {
-  const { changeDashboardId, selected_dashboard_id } = useAppContext();
-  const sdk = useSdk();
-  const db = useSWR(`dashboard-${id}`, () =>
-    sdk.ok(sdk.dashboard(id, "id,title"))
-  );
-  return (
-    <ListItem
-      selected={selected_dashboard_id === id}
-      onClick={() => {
-        changeDashboardId(id);
-      }}
-      itemRole="link"
-    >
-      {db.isLoading ? (
-        <Skeleton show={true} width="100%" color="transparent" height="100%">
-          Loading...
-        </Skeleton>
-      ) : (
-        <>{db.data?.title}</>
-      )}
-    </ListItem>
-  );
-};
+import {
+  getBoardList,
+  groupBoardForHorizon,
+  IBoardList,
+} from "../utils/getBoardList";
+import DashboardItem from "./DashboardItem";
 
 const StyledDivider = styled(Divider)`
   margin-top: 0.5rem;
@@ -73,6 +47,7 @@ const SectionItem = ({ title, description }: IBoardList) => {
 
 const BoardList: React.FC = () => {
   const { board_id } = useAppContext();
+  const { config } = useConfigContext();
   const sdk = useSdk();
   const board = useSWR(board_id?.length ? `board-${board_id}` : null, () =>
     sdk.ok(sdk.board(board_id!))
@@ -85,15 +60,47 @@ const BoardList: React.FC = () => {
     return getBoardList(board.data);
   }, [board.data]);
 
+  const horizonGroups = useMemo(
+    () => groupBoardForHorizon(list, board.data?.description).groups,
+    [list, board.data?.description]
+  );
+
+  const renderDashboard = (item: IBoardList) => (
+    <DashboardItem
+      key={`dashboard-${item.id}`}
+      dashboard_id={item.id}
+      fallback_title={item.title}
+      from_board
+    />
+  );
+
+  if (config.theme === "horizon") {
+    return (
+      <div className="hz-stack">
+        {horizonGroups.map((group) => (
+          <div className="hz-pod" key={`pod-${group.id}`}>
+            {group.title && (
+              <div className="hz-pod-top">
+                <span className="hz-pod-name">{group.title}</span>
+                <span className="hz-pod-cnt">{group.items.length}</span>
+              </div>
+            )}
+            {group.items.map(renderDashboard)}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <List style={{ overflow: "auto" }}>
-      {list.map((item) => {
-        if (item.type === "dashboard") {
-          return <DashboardItem key={`dashboard-${item.id}`} {...item} />;
-        } else {
-          return <SectionItem key={`section-${item.id}`} {...item} />;
-        }
-      })}
+      {list.map((item) =>
+        item.type === "dashboard" ? (
+          renderDashboard(item)
+        ) : (
+          <SectionItem key={`section-${item.id}`} {...item} />
+        )
+      )}
     </List>
   );
 };

@@ -27,6 +27,8 @@ const intersection = (arr1: string[], arr2: string[]): string[] => {
 };
 
 export interface IExtensionConfig {
+  theme?: "horizon";
+  display_dashboard_descriptions?: boolean;
   dashboards?: string[];
   default_board_id?: string;
   setting_group_ids?: string[];
@@ -102,6 +104,8 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
   const config_data_with_defaults = useMemo(
     () => ({
       ...config_data,
+      display_dashboard_descriptions:
+        config_data.display_dashboard_descriptions ?? false,
       remove_branded_loading: config_data.remove_branded_loading ?? false,
       print_all_dashboards: config_data.print_all_dashboards ?? true,
       enable_folder_navigation: config_data.enable_folder_navigation ?? true,

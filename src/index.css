@@ -147,3 +147,204 @@ body, html, #extension-root {
     padding: 0;
     overflow: hidden;
 }
+
+/* Horizon theme (08 Cobalt Horizon Glass) */
+.hz-bg {
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.35) 0%, transparent 45%),
+        radial-gradient(circle at 14% 100%, rgba(14, 165, 233, 0.45) 0%, transparent 45%),
+        linear-gradient(135deg, #2563eb 0%, #3b82f6 45%, #38bdf8 100%);
+}
+
+.hz-shell {
+    width: 100%;
+    height: 100%;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 18px;
+}
+
+.hz-sidebar {
+    background: rgba(240, 247, 255, 0.76);
+    backdrop-filter: blur(30px) saturate(180%);
+    -webkit-backdrop-filter: blur(30px) saturate(180%);
+    border-radius: 22px;
+    border: 1.5px solid rgba(255, 255, 255, 0.88);
+    box-shadow: 0 20px 44px rgba(15, 42, 110, 0.26);
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.hz-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 2px 6px 4px;
+}
+
+.hz-title {
+    font-size: 22px;
+    font-weight: 500;
+    line-height: 1.2;
+    color: #0f172a;
+}
+
+.hz-subtitle {
+    font-size: 11.5px;
+    line-height: 1.35;
+    color: #475569;
+    margin-top: 3px;
+}
+
+.hz-gear {
+    width: 34px;
+    height: 34px;
+    border-radius: 11px;
+    flex-shrink: 0;
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(203, 213, 225, 0.85);
+    color: #1e40af;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.06);
+}
+
+.hz-gear:hover {
+    background: #ffffff;
+}
+
+.hz-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.hz-pod {
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 10px 8px 8px;
+    box-shadow: 0 4px 14px rgba(30, 64, 175, 0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.hz-pod-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 8px 5px;
+}
+
+.hz-pod-name {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #1d4ed8;
+}
+
+.hz-pod-cnt {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.hz-item-wrap {
+    position: relative;
+}
+
+.hz-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    text-align: left;
+    background: transparent;
+    border: none;
+    padding: 6.5px 10px;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 12.5px;
+    line-height: 1.32;
+    color: #1e293b;
+    cursor: pointer;
+}
+
+.hz-item:hover {
+    background: rgba(37, 99, 235, 0.08);
+}
+
+.hz-item[data-active="true"] {
+    background: linear-gradient(90deg, #1d4ed8, #2563eb);
+    color: #ffffff;
+    font-weight: 500;
+    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+.hz-chev {
+    font-size: 17px;
+    line-height: 1;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+.hz-item-wrap .dash-actions {
+    display: none;
+}
+
+.hz-item-wrap:hover .dash-actions,
+.hz-item-wrap .dash-actions[data-open="true"] {
+    display: inline-flex;
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    align-items: center;
+    gap: 2px;
+    border-radius: 7px;
+    padding: 0 2px;
+    background: rgba(235, 244, 255, 0.94);
+}
+
+.hz-item-wrap .dash-actions button {
+    color: #1e40af;
+}
+
+.hz-item-wrap[data-active="true"] .dash-actions {
+    background: #2563eb;
+}
+
+.hz-item-wrap[data-active="true"] .dash-actions button {
+    color: rgba(255, 255, 255, 0.92);
+}
+
+.hz-item-wrap:hover:has(.dash-actions) .hz-chev,
+.hz-item-wrap:has(.dash-actions[data-open="true"]) .hz-chev {
+    opacity: 0;
+}
+
+.hz-stage {
+    border-radius: 22px !important;
+    overflow: hidden;
+    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
+    box-shadow: 0 20px 44px rgba(15, 42, 110, 0.26) !important;
+}

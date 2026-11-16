@@ -4,7 +4,7 @@ import {
   PopoverLayout,
   SpaceVertical,
 } from "@looker/components";
-import { ChevronRight } from "@styled-icons/material";
+import { ChevronRight, Settings as SettingsIcon } from "@styled-icons/material";
 import React, { useMemo } from "react";
 import useSWR from "swr";
 import { useBoolean } from "usehooks-ts";
@@ -19,7 +19,7 @@ import { PrintAll } from "./PrintAll";
 import SaveAdhocDashboard from "./SaveAdhocDashboard";
 import SwitchToAdhocDashboard from "./SwitchToAdhocDashboard";
 
-const ConfiguredButtons: React.FC = () => {
+const ConfiguredButtons: React.FC<{ compact?: boolean }> = ({ compact }) => {
   const { config: config_data, can_update_settings } = useConfigContext();
   const dashboard_ids: string[] = config_data.dashboards || [];
   const { folder_id, board_id, adhoc_dashboard_ids } = useAppContext();
@@ -99,15 +99,23 @@ const ConfiguredButtons: React.FC = () => {
     return buttons;
   }, [can_update_settings, config_data, board_id, board.data, show_dashboards]);
 
-  // If only one button, show it directly
-  if (activeButtons.length === 1) {
+  // If only one button (and not compact non-settings), show it directly
+  if (
+    activeButtons.length === 1 &&
+    (!compact || activeButtons[0].key === "settings")
+  ) {
     const button = activeButtons[0];
     const Component = button.component;
-    return <Component {...button.props} />;
+    return (
+      <Component
+        {...button.props}
+        {...(compact && button.key === "settings" ? { compact: true } : {})}
+      />
+    );
   }
 
-  // If multiple buttons, show popover
-  if (activeButtons.length > 1) {
+  // If multiple buttons (or compact single non-settings action), show popover
+  if (activeButtons.length >= 1) {
     return (
       <Popover
         key={activeButtons.map((b) => b.key).join(",")}
@@ -125,14 +133,26 @@ const ConfiguredButtons: React.FC = () => {
           </PopoverLayout>
         }
       >
-        <ButtonOutline
-          iconAfter={<ChevronRight size={16} />}
-          onClick={() => popoverOpen.setTrue()}
-          fullWidth
-          color="neutral"
-        >
-          Actions
-        </ButtonOutline>
+        {compact ? (
+          <button
+            type="button"
+            className="hz-gear"
+            onClick={() => popoverOpen.setTrue()}
+            aria-label="Actions"
+            title="Actions"
+          >
+            <SettingsIcon size={17} />
+          </button>
+        ) : (
+          <ButtonOutline
+            iconAfter={<ChevronRight size={16} />}
+            onClick={() => popoverOpen.setTrue()}
+            fullWidth
+            color="neutral"
+          >
+            Actions
+          </ButtonOutline>
+        )}
       </Popover>
     );
   }

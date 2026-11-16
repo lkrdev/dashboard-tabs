@@ -46,18 +46,23 @@ const mountApp = () => {
 
 const ComponentsWrapper = ({ children }: { children: React.ReactNode }) => {
   const {
-    config: { background_color, paper_color },
+    config: { theme, background_color, paper_color },
   } = useConfigContext();
+  const isHorizon = theme === "horizon";
+  const paper = isHorizon
+    ? "#FFFFFF"
+    : paper_color || DEFAULT_DASHBOARD_PAPER_COLOR;
+  const ink = isHorizon ? "#0F172A" : getTextColor(paper);
 
   return (
     <ComponentsProvider
       themeCustomizations={{
         colors: {
-          key: background_color,
-          background: paper_color || DEFAULT_DASHBOARD_PAPER_COLOR,
-          text: getTextColor(paper_color || DEFAULT_DASHBOARD_PAPER_COLOR),
-          title: getTextColor(paper_color || DEFAULT_DASHBOARD_PAPER_COLOR),
-          body: getTextColor(paper_color || DEFAULT_DASHBOARD_PAPER_COLOR),
+          key: isHorizon ? "#2563EB" : background_color,
+          background: paper,
+          text: ink,
+          title: ink,
+          body: ink,
         },
       }}
     >
