@@ -6,6 +6,7 @@ import { useAppContext } from "../AppContext";
 import useConfigContext from "../ConfigContext";
 import useExtensionSdk from "../hooks/useExtensionSdk";
 import useSdk from "../hooks/useSdk";
+import { getBoardList, groupBoardForHorizon } from "../utils/getBoardList";
 import AdhocDashboard from "./AdhocDashboard";
 import BoardList from "./BoardList";
 import ConfiguredButtons from "./ConfiguredButtons";
@@ -57,6 +58,59 @@ const Sidebar: React.FC = () => {
   useEffect(() => {
     extensionSdk.updateTitle(`${header_title} - Dashboard Tabs`);
   }, [header_title, extensionSdk]);
+
+  const horizon_subtitle = useMemo(() => {
+    if (config_data.theme !== "horizon" || type !== "board" || !board.data) {
+      return undefined;
+    }
+    return groupBoardForHorizon(
+      getBoardList(board.data),
+      board.data.description
+    ).subtitle;
+  }, [config_data.theme, type, board.data]);
+
+  if (config_data.theme === "horizon") {
+    return (
+      <aside className="hz-sidebar">
+        <div className="hz-head">
+          <div style={{ minWidth: 0 }}>
+            <div className="hz-title">
+              <Balancer>{header_title}</Balancer>
+            </div>
+            {horizon_subtitle && (
+              <div className="hz-subtitle">{horizon_subtitle}</div>
+            )}
+          </div>
+          <ConfiguredButtons compact />
+        </div>
+        {type === "board" ? (
+          <BoardList />
+        ) : (
+          <div className="hz-stack">
+            <div className="hz-pod">
+              <div className="hz-pod-top">
+                <span className="hz-pod-name">Dashboards</span>
+                <span className="hz-pod-cnt">{show_dashboards!.length}</span>
+              </div>
+              {show_dashboards!.length === 0 ? (
+                <Span p="xsmall" fontSize="xsmall" color="text">
+                  No {type === "adhoc" ? "" : "default"} dashboards found
+                </Span>
+              ) : (
+                show_dashboards!.map((dashboard_id: string) => (
+                  <DashboardItem
+                    key={dashboard_id}
+                    dashboard_id={dashboard_id}
+                  />
+                ))
+              )}
+            </div>
+          </div>
+        )}
+        {adhoc_dashboard_ids && <AdhocDashboard />}
+      </aside>
+    );
+  }
 
   return (
     <Card raised position="relative" p="xsmall" borderRadius="large">

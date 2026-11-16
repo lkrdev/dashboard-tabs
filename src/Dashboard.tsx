@@ -190,6 +190,7 @@ function updateDashboardLayout(data, layoutType) {
     <StyledCard
       raised
       borderRadius="large"
+      className={config.theme === "horizon" ? "hz-stage" : undefined}
       ref={dashboardRef}
       iframe_visible={iframe_visible.value}
     />

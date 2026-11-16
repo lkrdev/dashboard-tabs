@@ -1,32 +1,32 @@
 import { getTextColor } from "./colorUtils";
 
 export const createDashboardTheme = (config: {
+  theme?: string;
   background_color?: string;
   paper_color?: string;
   hide_dashboard_header?: boolean;
-}) => ({
-  _theme: JSON.stringify({
-    background_color: config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR,
-    tile_text_color: getTextColor(
-      config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR
-    ),
-    text_tile_text_color: getTextColor(
-      config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR
-    ),
-    body_text_color: getTextColor(
-      config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR
-    ),
-    font_color: getTextColor(
-      config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR
-    ),
-    primary_button_color:
-      config.background_color || DEFAULT_DASHBOARD_BACKGROUND_COLOR,
-    title_color: getTextColor(
-      config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR
-    ),
-    ...(config.hide_dashboard_header ? { show_dashboard_header: false } : {}),
-  }),
-});
+}) => {
+  const isHorizon = config.theme === "horizon";
+  const paper = isHorizon
+    ? "#ffffff"
+    : config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR;
+  const button = isHorizon
+    ? "#2563EB"
+    : config.background_color || DEFAULT_DASHBOARD_BACKGROUND_COLOR;
+  const textColor = getTextColor(paper);
+  return {
+    _theme: JSON.stringify({
+      background_color: paper,
+      tile_text_color: textColor,
+      text_tile_text_color: textColor,
+      body_text_color: textColor,
+      font_color: textColor,
+      primary_button_color: button,
+      title_color: textColor,
+      ...(config.hide_dashboard_header ? { show_dashboard_header: false } : {}),
+    }),
+  };
+};
 
 export const DEFAULT_DASHBOARD_BACKGROUND_COLOR = "#A3B3C9";
 export const DEFAULT_DASHBOARD_PAPER_COLOR = "#f6f8fa";

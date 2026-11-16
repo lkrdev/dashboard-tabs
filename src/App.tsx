@@ -26,8 +26,9 @@ const App: React.FC = () => {
   }, []);
 
   const {
-    config: { remove_branded_loading, background_color },
+    config: { theme, remove_branded_loading, background_color },
   } = useConfigContext();
+  const isHorizon = theme === "horizon";
 
   if (isLoading || (initial_wait.value && !Boolean(remove_branded_loading))) {
     return (
@@ -37,19 +38,34 @@ const App: React.FC = () => {
         display="flex"
         justifyContent="center"
         alignItems="center"
-        backgroundColor={background_color || DEFAULT_DASHBOARD_PAPER_COLOR}
+        className={isHorizon ? "hz-bg" : undefined}
+        backgroundColor={
+          isHorizon ? undefined : background_color || DEFAULT_DASHBOARD_PAPER_COLOR
+        }
       >
         {!Boolean(remove_branded_loading) && (
           <LkrLoading
             duration={750}
-            color={getTextColor(
-              background_color || DEFAULT_DASHBOARD_PAPER_COLOR
-            )}
+            color={
+              isHorizon
+                ? "#ffffff"
+                : getTextColor(
+                    background_color || DEFAULT_DASHBOARD_PAPER_COLOR
+                  )
+            }
           />
         )}
       </Box>
     );
   } else if (me) {
+    if (isHorizon) {
+      return (
+        <div className="hz-shell hz-bg">
+          <Sidebar />
+          <Dashboard />
+        </div>
+      );
+    }
     return (
       <>
         <Box

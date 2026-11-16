@@ -1,4 +1,41 @@
-import { IBoard } from "@looker/sdk";
+import type { IBoard } from "@looker/sdk";
+
+export const briefDescription = (text?: string | null, max = 80): string => {
+  const clean = text?.replace(/\s+/g, " ").trim() || "";
+  return clean.length > max ? `${clean.slice(0, max).trimEnd()}…` : clean;
+};
+
+export const groupBoardForHorizon = (
+  list: IBoardList[],
+  boardDescription?: string | null
+) => {
+  const raw: Array<{
+    id: string;
+    title?: string;
+    description?: string;
+    items: IBoardList[];
+  }> = [];
+  for (const entry of list) {
+    if (entry.type === "section") {
+      raw.push({
+        id: entry.id,
+        title: entry.title === "Section" ? undefined : entry.title,
+        description: entry.description,
+        items: [],
+      });
+    } else {
+      if (!raw.length) raw.push({ id: "ungrouped", items: [] });
+      raw[raw.length - 1].items.push(entry);
+    }
+  }
+  const leadEmpty = raw[0]?.items.length === 0 ? raw[0] : undefined;
+  const subtitle =
+    boardDescription?.trim() || leadEmpty?.description || leadEmpty?.title;
+  return {
+    subtitle: subtitle || undefined,
+    groups: raw.filter((g) => g.items.length > 0),
+  };
+};
 
 export interface IBoardList {
   type: "dashboard" | "section";

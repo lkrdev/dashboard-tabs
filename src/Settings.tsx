@@ -15,6 +15,7 @@ import {
   SpaceVertical,
   Span,
 } from "@looker/components";
+import { Settings as SettingsIcon } from "@styled-icons/material";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
 import useSWR from "swr";
@@ -34,7 +35,7 @@ const getDefaultMode = (cfg: IExtensionConfig): DefaultSourceMode =>
     ? "dashboards"
     : "none";
 
-const Settings: React.FC = () => {
+const Settings: React.FC<{ compact?: boolean }> = ({ compact }) => {
   const { showSuccess } = useToast();
   const open = useBoolean(false);
   const [debounced_search, setDebouncedSearch] = useDebounceValue("", 500);
@@ -86,6 +87,9 @@ const Settings: React.FC = () => {
     validateOnChange: false,
     validateOnBlur: true,
     initialValues: {
+      theme: config_data.theme,
+      display_dashboard_descriptions:
+        config_data.display_dashboard_descriptions || false,
       dashboards: config_data.dashboards || [],
       default_board_id: config_data.default_board_id || "",
       restrict_settings: config_data.restrict_settings || false,
@@ -139,9 +143,21 @@ const Settings: React.FC = () => {
 
   return (
     <>
-      <ButtonOutline fullWidth onClick={() => open.setTrue()} color="neutral">
-        Settings
-      </ButtonOutline>
+      {compact ? (
+        <button
+          type="button"
+          className="hz-gear"
+          onClick={() => open.setTrue()}
+          aria-label="Settings"
+          title="Settings"
+        >
+          <SettingsIcon size={17} />
+        </button>
+      ) : (
+        <ButtonOutline fullWidth onClick={() => open.setTrue()} color="neutral">
+          Settings
+        </ButtonOutline>
+      )}
       <Dialog
         isOpen={open.value}
         onClose={async () => {
@@ -361,6 +377,28 @@ const Settings: React.FC = () => {
                 Enable Board Navigation
               </Label>
             </Space>
+            <Space>
+              <Checkbox
+                name="display_dashboard_descriptions"
+                checked={values.display_dashboard_descriptions || false}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  formik.setFieldValue(
+                    "display_dashboard_descriptions",
+                    e.target.checked
+                  );
+                }}
+              />
+              <Label
+                onClick={() => {
+                  formik.setFieldValue(
+                    "display_dashboard_descriptions",
+                    !values.display_dashboard_descriptions
+                  );
+                }}
+              >
+                Display Dashboard Description Tooltips
+              </Label>
+            </Space>
             {values.allow_adhoc_dashboards &&
               values.enable_board_navigation && (
                 <Space>
@@ -420,41 +458,63 @@ const Settings: React.FC = () => {
               <Label>Remove Branded Loading</Label>
             </Space>
             <Divider />
-            <Space width="250px" between>
-              <Label>Background Color</Label>
-              <input
-                type="color"
-                value={values.background_color || "#A3B3C9"}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  formik.setFieldValue("background_color", e.target.value)
-                }
-                style={{
-                  width: "50px",
-                  height: "30px",
-                  border: "1px solid #ccc",
-                  borderRadius: "4px",
-                  cursor: "pointer",
+            <Space>
+              <Label>Theme</Label>
+              <ButtonToggle
+                value={values.theme || "original"}
+                onChange={(val: string) => {
+                  if (val) {
+                    formik.setFieldValue(
+                      "theme",
+                      val === "original" ? undefined : val
+                    );
+                  }
                 }}
+                options={[
+                  { value: "original", label: "Original" },
+                  { value: "horizon", label: "Horizon" },
+                ]}
               />
             </Space>
+            {values.theme !== "horizon" && (
+              <>
+                <Space width="250px" between>
+                  <Label>Background Color</Label>
+                  <input
+                    type="color"
+                    value={values.background_color || "#A3B3C9"}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      formik.setFieldValue("background_color", e.target.value)
+                    }
+                    style={{
+                      width: "50px",
+                      height: "30px",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  />
+                </Space>
+                <Space width="250px" between>
+                  <Label>Paper Color</Label>
+                  <input
+                    type="color"
+                    value={values.paper_color || "#ffffff"}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                      formik.setFieldValue("paper_color", e.target.value)
+                    }
+                    style={{
+                      width: "50px",
+                      height: "30px",
+                      border: "1px solid #ccc",
+                      borderRadius: "4px",
+                      cursor: "pointer",
+                    }}
+                  />
+                </Space>
+              </>
+            )}
             <SpaceVertical gap="none">
-              <Space width="250px" between>
-                <Label>Paper Color</Label>
-                <input
-                  type="color"
-                  value={values.paper_color || "#ffffff"}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                    formik.setFieldValue("paper_color", e.target.value)
-                  }
-                  style={{
-                    width: "50px",
-                    height: "30px",
-                    border: "1px solid #ccc",
-                    borderRadius: "4px",
-                    cursor: "pointer",
-                  }}
-                />
-              </Space>
               <Space mt="small">
                 <Checkbox
                   name="hide_dashboard_header"
