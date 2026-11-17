@@ -79,10 +79,17 @@ const BoardList: React.FC = () => {
       <div className="hz-stack">
         {horizonGroups.map((group) => (
           <div className="hz-pod" key={`pod-${group.id}`}>
-            {group.title && (
-              <div className="hz-pod-top">
-                <span className="hz-pod-name">{group.title}</span>
-                <span className="hz-pod-cnt">{group.items.length}</span>
+            {(group.title || group.description) && (
+              <div className="hz-pod-head">
+                {group.title && (
+                  <div className="hz-pod-top">
+                    <span className="hz-pod-name">{group.title}</span>
+                    <span className="hz-pod-cnt">{group.items.length}</span>
+                  </div>
+                )}
+                {group.description && (
+                  <div className="hz-pod-desc">{group.description}</div>
+                )}
               </div>
             )}
             {group.items.map(renderDashboard)}

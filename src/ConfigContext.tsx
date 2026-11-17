@@ -148,7 +148,7 @@ const ConfigContextProvider: React.FC<{ children: React.ReactNode }> = ({
       console.error("You are not allowed to update the settings");
       return;
     }
-    let current: IExtensionConfig = extension_sdk.getContextData() || {};
+    const current: IExtensionConfig = { ...extension_sdk.getContextData() };
     const prev_default_board_id = current.default_board_id;
     for (const [key, value] of Object.entries(values)) {
       const casted_key = key as keyof IExtensionConfig;

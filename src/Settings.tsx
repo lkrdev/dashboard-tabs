@@ -124,6 +124,7 @@ const Settings: React.FC<{ compact?: boolean }> = ({ compact }) => {
     onSubmit: async (values) => {
       await updateConfig({
         ...values,
+        theme: values.theme || undefined,
         dashboards:
           default_mode === "dashboards" ? values.dashboards : undefined,
         default_board_id:
@@ -163,7 +164,7 @@ const Settings: React.FC<{ compact?: boolean }> = ({ compact }) => {
         onClose={async () => {
           const errors = await formik.validateForm();
           if (Object.keys(errors).length === 0) {
-            await formik.handleSubmit();
+            await formik.submitForm();
             open.setFalse();
           }
           setSearch("");
