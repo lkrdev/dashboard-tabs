@@ -242,11 +242,21 @@ body, html, #extension-root {
     gap: 2px;
 }
 
+.hz-pod-head {
+    padding: 0 8px 5px;
+}
+
 .hz-pod-top {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 8px 5px;
+}
+
+.hz-pod-desc {
+    font-size: 11.5px;
+    line-height: 1.35;
+    color: #64748b;
+    margin-top: 2px;
 }
 
 .hz-pod-name {

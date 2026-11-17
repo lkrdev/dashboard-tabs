@@ -1,11 +1,14 @@
 import {
+  CopyToClipboard,
   IconButton,
   ListItem,
+  ModalHeaderCloseButton,
   Popover,
-  PopoverLayout,
+  PopoverContent,
+  PopoverHeader,
   Span,
 } from "@looker/components";
-import { Delete, Info } from "@styled-icons/material";
+import { Check, ContentCopy, Delete, Info } from "@styled-icons/material";
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import useSWR from "swr";
@@ -94,17 +97,40 @@ const DashboardItem = ({
             isOpen={infoOpen}
             setOpen={setInfoOpen}
             placement="right"
-            width="280px"
+            width="560px"
             content={
-              <PopoverLayout header={title} footer={false}>
-                <Span
-                  fontSize="xsmall"
-                  color="text"
-                  style={{ whiteSpace: "pre-wrap", lineHeight: 1.45 }}
+              <>
+                <PopoverHeader
+                  detail={
+                    <span style={{ display: "inline-flex", gap: 2 }}>
+                      <CopyToClipboard
+                        content={description!}
+                        success={
+                          <IconButton icon={<Check />} size="small" label="Copied" />
+                        }
+                      >
+                        <IconButton
+                          icon={<ContentCopy />}
+                          size="small"
+                          label="Copy to clipboard"
+                        />
+                      </CopyToClipboard>
+                      <ModalHeaderCloseButton size="small" />
+                    </span>
+                  }
                 >
-                  {description}
-                </Span>
-              </PopoverLayout>
+                  {title}
+                </PopoverHeader>
+                <PopoverContent>
+                  <Span
+                    fontSize="xsmall"
+                    color="text"
+                    style={{ whiteSpace: "pre-wrap", lineHeight: 1.45 }}
+                  >
+                    {description}
+                  </Span>
+                </PopoverContent>
+              </>
             }
           >
             <IconButton
