@@ -25,6 +25,7 @@ import ProgressIndicator from "./components/ProgressIndicator";
 import { useToast } from "./components/Toast/ToastContext";
 import useConfigContext, { IExtensionConfig } from "./ConfigContext";
 import useSdk from "./hooks/useSdk";
+import { HORIZON_ACCENT, HORIZON_BG, HORIZON_PAPER } from "./utils/constants";
 
 type DefaultSourceMode = "none" | "dashboards" | "board";
 
@@ -88,6 +89,9 @@ const Settings: React.FC<{ compact?: boolean }> = ({ compact }) => {
     validateOnBlur: true,
     initialValues: {
       theme: config_data.theme,
+      horizon_background_color: config_data.horizon_background_color,
+      horizon_paper_color: config_data.horizon_paper_color,
+      horizon_accent_color: config_data.horizon_accent_color,
       display_dashboard_descriptions:
         config_data.display_dashboard_descriptions || false,
       dashboards: config_data.dashboards || [],
@@ -125,6 +129,9 @@ const Settings: React.FC<{ compact?: boolean }> = ({ compact }) => {
       await updateConfig({
         ...values,
         theme: values.theme || undefined,
+        horizon_background_color: values.horizon_background_color || undefined,
+        horizon_paper_color: values.horizon_paper_color || undefined,
+        horizon_accent_color: values.horizon_accent_color || undefined,
         dashboards:
           default_mode === "dashboards" ? values.dashboards : undefined,
         default_board_id:
@@ -477,43 +484,58 @@ const Settings: React.FC<{ compact?: boolean }> = ({ compact }) => {
                 ]}
               />
             </Space>
-            {values.theme !== "horizon" && (
-              <>
-                <Space width="250px" between>
-                  <Label>Background Color</Label>
-                  <input
-                    type="color"
-                    value={values.background_color || "#A3B3C9"}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      formik.setFieldValue("background_color", e.target.value)
-                    }
-                    style={{
-                      width: "50px",
-                      height: "30px",
-                      border: "1px solid #ccc",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                  />
-                </Space>
-                <Space width="250px" between>
-                  <Label>Paper Color</Label>
-                  <input
-                    type="color"
-                    value={values.paper_color || "#ffffff"}
-                    onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                      formik.setFieldValue("paper_color", e.target.value)
-                    }
-                    style={{
-                      width: "50px",
-                      height: "30px",
-                      border: "1px solid #ccc",
-                      borderRadius: "4px",
-                      cursor: "pointer",
-                    }}
-                  />
-                </Space>
-              </>
+            {(values.theme === "horizon"
+              ? ([
+                  ["Background Color", "horizon_background_color", HORIZON_BG],
+                  ["Paper Color", "horizon_paper_color", HORIZON_PAPER],
+                  ["Accent Color", "horizon_accent_color", HORIZON_ACCENT],
+                ] as const)
+              : ([
+                  ["Background Color", "background_color", "#A3B3C9"],
+                  ["Paper Color", "paper_color", "#ffffff"],
+                ] as const)
+            ).map(([label, key, fallback]) => (
+              <Space key={key} width="250px" between>
+                <Label>{label}</Label>
+                <input
+                  type="color"
+                  value={values[key] || fallback}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                    formik.setFieldValue(key, e.target.value)
+                  }
+                  style={{
+                    width: "50px",
+                    height: "30px",
+                    border: "1px solid #ccc",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                />
+              </Space>
+            ))}
+            {values.theme === "horizon" && (
+              <div>
+                <ButtonOutline
+                  type="button"
+                  size="xsmall"
+                  color="neutral"
+                  disabled={
+                    !values.horizon_background_color &&
+                    !values.horizon_paper_color &&
+                    !values.horizon_accent_color
+                  }
+                  onClick={() =>
+                    formik.setValues({
+                      ...values,
+                      horizon_background_color: undefined,
+                      horizon_paper_color: undefined,
+                      horizon_accent_color: undefined,
+                    })
+                  }
+                >
+                  Reset to Cobalt defaults
+                </ButtonOutline>
+              </div>
             )}
             <SpaceVertical gap="none">
               <Space mt="small">

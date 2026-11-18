@@ -1,17 +1,26 @@
-import { getTextColor } from "./colorUtils";
+import type { CSSProperties } from "react";
+import { getReadableTextColor, getTextColor, isLightColor } from "./colorUtils";
+
+export const DEFAULT_DASHBOARD_BACKGROUND_COLOR = "#A3B3C9";
+export const DEFAULT_DASHBOARD_PAPER_COLOR = "#f6f8fa";
+export const HORIZON_BG = "#2563eb";
+export const HORIZON_PAPER = "#ffffff";
+export const HORIZON_ACCENT = "#2563eb";
 
 export const createDashboardTheme = (config: {
   theme?: string;
   background_color?: string;
   paper_color?: string;
+  horizon_paper_color?: string;
+  horizon_accent_color?: string;
   hide_dashboard_header?: boolean;
 }) => {
   const isHorizon = config.theme === "horizon";
   const paper = isHorizon
-    ? "#ffffff"
+    ? config.horizon_paper_color || HORIZON_PAPER
     : config.paper_color || DEFAULT_DASHBOARD_PAPER_COLOR;
   const button = isHorizon
-    ? "#2563EB"
+    ? config.horizon_accent_color || HORIZON_ACCENT
     : config.background_color || DEFAULT_DASHBOARD_BACKGROUND_COLOR;
   const textColor = getTextColor(paper);
   return {
@@ -28,5 +37,22 @@ export const createDashboardTheme = (config: {
   };
 };
 
-export const DEFAULT_DASHBOARD_BACKGROUND_COLOR = "#A3B3C9";
-export const DEFAULT_DASHBOARD_PAPER_COLOR = "#f6f8fa";
+export const getHorizonStyle = (config: {
+  horizon_background_color?: string;
+  horizon_paper_color?: string;
+  horizon_accent_color?: string;
+}): CSSProperties => {
+  const bg = config.horizon_background_color || HORIZON_BG;
+  const paper = config.horizon_paper_color || HORIZON_PAPER;
+  const accent = config.horizon_accent_color || HORIZON_ACCENT;
+  return {
+    "--hz-bg": bg,
+    "--hz-paper": paper,
+    "--hz-accent": accent,
+    "--hz-accent-fg": getReadableTextColor(accent),
+    "--hz-ink": isLightColor(paper) ? "#0f172a" : "#f8fafc",
+    "--hz-rim": isLightColor(bg)
+      ? "rgba(15, 23, 42, 0.12)"
+      : "rgba(255, 255, 255, 0.85)",
+  } as CSSProperties;
+};

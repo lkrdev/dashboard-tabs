@@ -148,12 +148,24 @@ body, html, #extension-root {
     overflow: hidden;
 }
 
-/* Horizon theme (08 Cobalt Horizon Glass) */
+/* Horizon theme (08 Cobalt Horizon Glass, customizable via --hz-* tokens) */
 .hz-bg {
     background:
         radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.35) 0%, transparent 45%),
         radial-gradient(circle at 14% 100%, rgba(14, 165, 233, 0.45) 0%, transparent 45%),
         linear-gradient(135deg, #2563eb 0%, #3b82f6 45%, #38bdf8 100%);
+}
+
+.hz-bg[data-custom-bg="true"] {
+    background:
+        radial-gradient(circle at 0% 0%, rgba(255, 255, 255, 0.28) 0%, transparent 48%),
+        radial-gradient(circle at 14% 100%, color-mix(in srgb, var(--hz-accent) 18%, transparent) 0%, transparent 48%),
+        linear-gradient(
+            135deg,
+            var(--hz-bg) 0%,
+            color-mix(in srgb, var(--hz-bg) 86%, white) 50%,
+            color-mix(in srgb, var(--hz-bg) 74%, white) 100%
+        );
 }
 
 .hz-shell {
@@ -166,12 +178,12 @@ body, html, #extension-root {
 }
 
 .hz-sidebar {
-    background: rgba(240, 247, 255, 0.76);
+    background: color-mix(in srgb, color-mix(in srgb, var(--hz-paper) 94%, var(--hz-accent)) 76%, transparent);
     backdrop-filter: blur(30px) saturate(180%);
     -webkit-backdrop-filter: blur(30px) saturate(180%);
     border-radius: 22px;
-    border: 1.5px solid rgba(255, 255, 255, 0.88);
-    box-shadow: 0 20px 44px rgba(15, 42, 110, 0.26);
+    border: 1.5px solid var(--hz-rim);
+    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.2);
     padding: 18px 14px;
     display: flex;
     flex-direction: column;
@@ -193,13 +205,13 @@ body, html, #extension-root {
     font-size: 22px;
     font-weight: 500;
     line-height: 1.2;
-    color: #0f172a;
+    color: var(--hz-ink);
 }
 
 .hz-subtitle {
     font-size: 11.5px;
     line-height: 1.35;
-    color: #475569;
+    color: color-mix(in srgb, var(--hz-ink) 72%, var(--hz-paper));
     margin-top: 3px;
 }
 
@@ -208,9 +220,9 @@ body, html, #extension-root {
     height: 34px;
     border-radius: 11px;
     flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(203, 213, 225, 0.85);
-    color: #1e40af;
+    background: color-mix(in srgb, var(--hz-paper) 86%, transparent);
+    border: 1px solid var(--hz-rim);
+    color: var(--hz-accent);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -219,7 +231,7 @@ body, html, #extension-root {
 }
 
 .hz-gear:hover {
-    background: #ffffff;
+    background: var(--hz-paper);
 }
 
 .hz-stack {
@@ -232,11 +244,11 @@ body, html, #extension-root {
 }
 
 .hz-pod {
-    background: rgba(255, 255, 255, 0.78);
-    border: 1px solid rgba(255, 255, 255, 0.95);
+    background: color-mix(in srgb, var(--hz-paper) 80%, transparent);
+    border: 1px solid var(--hz-rim);
     border-radius: 15px;
     padding: 10px 8px 8px;
-    box-shadow: 0 4px 14px rgba(30, 64, 175, 0.06);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.06);
     display: flex;
     flex-direction: column;
     gap: 2px;
@@ -255,7 +267,7 @@ body, html, #extension-root {
 .hz-pod-desc {
     font-size: 11.5px;
     line-height: 1.35;
-    color: #64748b;
+    color: color-mix(in srgb, var(--hz-ink) 58%, var(--hz-paper));
     margin-top: 2px;
 }
 
@@ -264,7 +276,7 @@ body, html, #extension-root {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: #1d4ed8;
+    color: var(--hz-accent);
 }
 
 .hz-pod-cnt {
@@ -273,8 +285,8 @@ body, html, #extension-root {
     font-weight: 600;
     padding: 2px 7px;
     border-radius: 999px;
-    background: #dbeafe;
-    color: #1e40af;
+    background: color-mix(in srgb, var(--hz-accent) 15%, var(--hz-paper));
+    color: var(--hz-accent);
 }
 
 .hz-item-wrap {
@@ -295,19 +307,19 @@ body, html, #extension-root {
     font-family: inherit;
     font-size: 12.5px;
     line-height: 1.32;
-    color: #1e293b;
+    color: var(--hz-ink);
     cursor: pointer;
 }
 
 .hz-item:hover {
-    background: rgba(37, 99, 235, 0.08);
+    background: color-mix(in srgb, var(--hz-accent) 10%, transparent);
 }
 
 .hz-item[data-active="true"] {
-    background: linear-gradient(90deg, #1d4ed8, #2563eb);
-    color: #ffffff;
+    background: linear-gradient(90deg, color-mix(in srgb, var(--hz-accent) 88%, black), var(--hz-accent));
+    color: var(--hz-accent-fg);
     font-weight: 500;
-    box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 6px 16px color-mix(in srgb, var(--hz-accent) 35%, transparent);
 }
 
 .hz-chev {
@@ -332,19 +344,19 @@ body, html, #extension-root {
     gap: 2px;
     border-radius: 7px;
     padding: 0 2px;
-    background: rgba(235, 244, 255, 0.94);
+    background: color-mix(in srgb, var(--hz-paper) 92%, var(--hz-accent));
 }
 
 .hz-item-wrap .dash-actions button {
-    color: #1e40af;
+    color: var(--hz-accent);
 }
 
 .hz-item-wrap[data-active="true"] .dash-actions {
-    background: #2563eb;
+    background: var(--hz-accent);
 }
 
 .hz-item-wrap[data-active="true"] .dash-actions button {
-    color: rgba(255, 255, 255, 0.92);
+    color: var(--hz-accent-fg);
 }
 
 .hz-item-wrap:hover:has(.dash-actions) .hz-chev,
@@ -353,8 +365,9 @@ body, html, #extension-root {
 }
 
 .hz-stage {
+    background: var(--hz-paper) !important;
     border-radius: 22px !important;
     overflow: hidden;
-    border: 1.5px solid rgba(255, 255, 255, 0.65) !important;
-    box-shadow: 0 20px 44px rgba(15, 42, 110, 0.26) !important;
+    border: 1.5px solid var(--hz-rim) !important;
+    box-shadow: 0 20px 44px rgba(15, 23, 42, 0.22) !important;
 }
