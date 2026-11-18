@@ -28,6 +28,9 @@ const intersection = (arr1: string[], arr2: string[]): string[] => {
 
 export interface IExtensionConfig {
   theme?: "horizon";
+  horizon_background_color?: string;
+  horizon_paper_color?: string;
+  horizon_accent_color?: string;
   display_dashboard_descriptions?: boolean;
   dashboards?: string[];
   default_board_id?: string;

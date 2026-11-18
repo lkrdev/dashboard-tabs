@@ -7,7 +7,11 @@ import useConfigContext from "./ConfigContext";
 import Dashboard from "./Dashboard";
 import Sidebar from "./Sidebar";
 import { getTextColor } from "./utils/colorUtils";
-import { DEFAULT_DASHBOARD_PAPER_COLOR } from "./utils/constants";
+import {
+  DEFAULT_DASHBOARD_PAPER_COLOR,
+  getHorizonStyle,
+  HORIZON_BG,
+} from "./utils/constants";
 
 const App: React.FC = () => {
   const { isLoading, me } = useAppContext();
@@ -25,10 +29,11 @@ const App: React.FC = () => {
     };
   }, []);
 
-  const {
-    config: { theme, remove_branded_loading, background_color },
-  } = useConfigContext();
+  const { config } = useConfigContext();
+  const { theme, remove_branded_loading, background_color } = config;
   const isHorizon = theme === "horizon";
+  const horizonStyle = isHorizon ? getHorizonStyle(config) : undefined;
+  const customHorizonBg = Boolean(config.horizon_background_color) || undefined;
 
   if (isLoading || (initial_wait.value && !Boolean(remove_branded_loading))) {
     return (
@@ -39,6 +44,8 @@ const App: React.FC = () => {
         justifyContent="center"
         alignItems="center"
         className={isHorizon ? "hz-bg" : undefined}
+        data-custom-bg={isHorizon ? customHorizonBg : undefined}
+        style={horizonStyle}
         backgroundColor={
           isHorizon ? undefined : background_color || DEFAULT_DASHBOARD_PAPER_COLOR
         }
@@ -48,7 +55,7 @@ const App: React.FC = () => {
             duration={750}
             color={
               isHorizon
-                ? "#ffffff"
+                ? getTextColor(config.horizon_background_color || HORIZON_BG)
                 : getTextColor(
                     background_color || DEFAULT_DASHBOARD_PAPER_COLOR
                   )
@@ -60,7 +67,11 @@ const App: React.FC = () => {
   } else if (me) {
     if (isHorizon) {
       return (
-        <div className="hz-shell hz-bg">
+        <div
+          className="hz-shell hz-bg"
+          data-custom-bg={customHorizonBg}
+          style={horizonStyle}
+        >
           <Sidebar />
           <Dashboard />
         </div>
